@@ -18,7 +18,8 @@ export const load: PageServerLoad = async () => {
 
 export const actions = {
 	create: async ({ request }) => {
-		const data = await request.formData();
+        const data = await request.formData();
+        console.log(data)
 		const productId = parseInt(data.get('productId')?.toString() || '0');
 		const quantity = parseInt(data.get('quantity')?.toString() || '0');
 

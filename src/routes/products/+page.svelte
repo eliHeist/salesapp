@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+
 	import { Button } from '$lib/components/ui/button';
 	import {
 		Table,
@@ -11,7 +12,12 @@
 	} from '$lib/components/ui/table';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
+    import * as Dialog from '$lib/components/ui/dialog';
+    
+    import { PackagePlus } from "lucide-svelte";
+    
 	import type { PageData } from './$types';
+	import Header from '../Header.svelte';
 
 	export let data: PageData;
 
@@ -60,9 +66,9 @@
 				<TableRow>
 					<TableHead>Name</TableHead>
 					<TableHead>SKU</TableHead>
-					<TableHead>Price</TableHead>
-					<TableHead>Stock</TableHead>
-					<TableHead>Actions</TableHead>
+					<TableHead class="text-right">Price</TableHead>
+					<TableHead class="text-right">Stock</TableHead>
+					<TableHead class="text-right"></TableHead>
 				</TableRow>
 			</TableHeader>
 			<TableBody>
@@ -70,13 +76,42 @@
 					<TableRow>
 						<TableCell>{product.name}</TableCell>
 						<TableCell>{product.sku}</TableCell>
-						<TableCell>${product.price.toFixed(2)}</TableCell>
-						<TableCell>{product.stock}</TableCell>
+						<TableCell class="text-right">{product.price.toLocaleString('en-US')}</TableCell>
+						<TableCell class="text-right">{product.stock}</TableCell>
 						<TableCell>
-							<form method="POST" action="?/delete" use:enhance>
-								<input type="hidden" name="id" value={product.id} />
-								<Button variant="destructive" size="sm" type="submit">Delete</Button>
-							</form>
+                            <div class="flex justify-end gap-2">
+                                <form class="hidden" method="POST" action="?/delete" use:enhance>
+                                    <input type="hidden" name="id" value={product.id} />
+                                    <Button variant="destructive" size="sm" type="submit">Delete</Button>
+                                </form>
+                                <Dialog.Root>
+                                    <Dialog.Trigger>
+                                        <div class="flex items-center">
+                                            <PackagePlus class="mr-2 h-4 w-4" /> Stock in
+                                        </div>
+                                    </Dialog.Trigger>
+                                    <Dialog.Content>
+                                        <Dialog.Header>
+                                            <Dialog.Title>Add stock for {product.name}.</Dialog.Title>
+                                            <Dialog.Description>
+                                                The current quantity in stock is {product.stock}.
+                                            </Dialog.Description>
+                                        </Dialog.Header>
+                                        <form method="POST" action="?/stock" use:enhance>
+                                            <input type="hidden" name="id" value={product.id} />    
+                                            <div class="grid gap-4 py-4">
+                                                <div class="grid items-center gap-4">
+                                                    <Label for="quantity">Quantity to stock</Label>
+                                                    <Input id="quantity" name="quantity" type="number" min="1" required />
+                                                </div>
+                                            </div>
+                                            <Dialog.Footer>
+                                                <Button type="submit">Save changes</Button>
+                                            </Dialog.Footer>
+                                        </form>
+                                    </Dialog.Content>
+                                </Dialog.Root>
+                            </div>
 						</TableCell>
 					</TableRow>
 				{/each}

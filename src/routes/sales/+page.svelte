@@ -11,42 +11,19 @@
 	} from '$lib/components/ui/table';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import {
-		Select,
-		SelectContent,
-		SelectItem,
-		SelectTrigger,
-		SelectValue
-	} from '$lib/components/ui/select';
 	import type { PageData } from './$types';
 
-	import Check from 'lucide-svelte/icons/check';
-	import ChevronsUpDown from 'lucide-svelte/icons/chevrons-up-down';
-	import * as Command from '$lib/components/ui/command/';
-	import * as Popover from '$lib/components/ui/popover/';
-	import { cn } from '$lib/utils.js';
-	import { tick } from 'svelte';
+	import SelectCombo from './SelectCombo.svelte';
+	import type { Product } from '@prisma/client';
 
 	export let data: PageData;
 
 	let showForm = false;
 
-    // combobox
-    let open = false;
-    let value = "";
-    let productId: string = '';
-    
-    let selectedValue: any = {name: null, stock: 0};
-    
-    // We want to refocus the trigger button when the user selects
-    // an item from the list so users can continue navigating the
-    // rest of the form with the keyboard.
-    function closeAndFocusTrigger(triggerId: string) {
-        open = false;
-        tick().then(() => {
-        document.getElementById(triggerId)?.focus();
-        });
-    }
+    let selectedProduct: Product | null = null;
+    $: productId = selectedProduct?.id;
+    $: stock = selectedProduct?.stock || 0;
+
 </script>
 
 <div class="space-y-6">
@@ -58,53 +35,17 @@
 	</div>
 
 	{#if showForm}
-		<form method="POST" action="?/create" use:enhance class="space-y-4 rounded-lg bg-card p-4">
+		<form method="POST" action="?/create" use:enhance class="space-y-4 rounded-lg bg-card p-4 border ">
 			<div class="grid grid-cols-2 gap-4">
 				<div class="space-y-2">
 					<Label for="productId">Product</Label>
-					<Input name="productId" value={value} required class="hidden" />
                     <br>
-					<Popover.Root bind:open let:ids>
-						<Popover.Trigger asChild let:builder>
-							<Button
-								builders={[builder]}
-								variant="outline"
-								role="combobox"
-								aria-expanded={open}
-								class="w-[200px] justify-between"
-							>
-								{selectedValue.name || 'Select a product'}
-								<ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-							</Button>
-						</Popover.Trigger>
-						<Popover.Content class="w-[200px] p-0">
-							<Command.Root>
-								<Command.Input placeholder="Search products..." />
-								<Command.Empty>No products found.</Command.Empty>
-								<Command.Group>
-									{#each data.products as product}
-										<Command.Item
-											value={product.id.toString()}
-											onSelect={(currentValue) => {
-												value = currentValue;
-                                                selectedValue = product;
-												closeAndFocusTrigger(ids.trigger);
-											}}
-										>
-											<Check
-												class={cn('mr-2 h-4 w-4', value != product.id.toString() && 'text-transparent')}
-											/>
-											{product.name}
-										</Command.Item>
-									{/each}
-								</Command.Group>
-							</Command.Root>
-						</Popover.Content>
-					</Popover.Root>
+                    <SelectCombo products={data.products} bind:selectedProduct />
+                    <input type="text" class="hidden" name="productId" bind:value={productId} required>
 				</div>
 				<div class="space-y-2">
 					<Label for="quantity">Quantity</Label>
-					<Input id="quantity" name="quantity" type="number" min="1" max={selectedValue.stock} required />
+					<Input id="quantity" name="quantity" type="number" min="1" max={stock} required />
 				</div>
 			</div>
 			<Button type="submit">Create Sale</Button>
@@ -126,7 +67,7 @@
 					<TableRow>
 						<TableCell>{sale.product.name}</TableCell>
 						<TableCell>{sale.quantity}</TableCell>
-						<TableCell>${sale.total.toFixed(2)}</TableCell>
+						<TableCell>{sale.total.toLocaleString('en-US')}</TableCell>
 						<TableCell>{new Date(sale.createdAt).toLocaleDateString()}</TableCell>
 					</TableRow>
 				{/each}
