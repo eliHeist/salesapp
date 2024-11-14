@@ -12,10 +12,10 @@
     export let selectedProduct: Product | null = null;
 
 	let open = false;
-	let value = '';
+	let value = 0;
     let search = '';
 
-	$: selectedValue = products.find((product) => product.id.toString() === value)?.name ?? 'Select a product...';
+	$: selectedValue = products.find((product) => product.id === value)?.name ?? 'Select a product...';
 
 	// We want to refocus the trigger button when the user selects
 	// an item from the list so users can continue navigating the
@@ -52,11 +52,11 @@
                     {#if product.name.toLowerCase().includes(search.toLowerCase())}
                     <button type="button" class="aria-selected:bg-accent aria-selected:text-accent-foreground relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 hover:bg-accent"
                         on:click={() => {
-                            value = product.id.toString();
+                            value = product.id;
                             selectedProduct = product;
                             closeAndFocusTrigger(ids.trigger);
                         }}>
-                        <Check class="h-4 w-4 mr-2 {product.id.toString() !== value ? 'opacity-0' : ''}" />
+                        <Check class="h-4 w-4 mr-2 {product.id !== value ? 'opacity-0' : ''}" />
                         
                         {product.name}
                     </button>

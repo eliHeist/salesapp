@@ -1,62 +1,70 @@
-import { prisma } from '$lib/server/db';
+import { PrismaClient } from '@prisma/client';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
+const prisma = new PrismaClient();
+
 export const load: PageServerLoad = async () => {
-	const [sales, products] = await Promise.all([
+	const [sales, products, saleBatches] = await Promise.all([
 		prisma.sale.findMany({
-			include: { product: true },
-			orderBy: { createdAt: 'desc' }
+			include: { product: true, batch: true },
 		}),
 		prisma.product.findMany({
 			where: { stock: { gt: 0 } }
+		}),
+		prisma.saleBatch.findMany({
+			include: { sales: { include: { product: true } } }
 		})
 	]);
 
-	return { sales, products };
+	return { sales, products, saleBatches };
 };
 
 export const actions = {
-	create: async ({ request }) => {
-        const data = await request.formData();
-        console.log(data)
-		const productId = parseInt(data.get('productId')?.toString() || '0');
-		const quantity = parseInt(data.get('quantity')?.toString() || '0');
-
-		if (!productId || !quantity) {
-			return fail(400, { error: 'Missing required fields' });
-		}
+	createBatch: async ({ request }) => {
+		const data = await request.formData();
+		const date = new Date(data.get('date')?.toString() || '');
+		const description = data.get('description')?.toString() || '';
+		const salesData = JSON.parse(data.get('sales')?.toString() || '[]');
 
 		try {
-			const product = await prisma.product.findUnique({
-				where: { id: productId }
+			const sales = salesData.map(({ productId, quantity }: { productId: number, quantity: number }) => ({
+				productId,
+				quantity,
+				total: 0 // Will calculate based on product price
+			}));
+
+			const batch = await prisma.saleBatch.create({
+				data: {
+					date,
+					description,
+					sales: {
+						create: sales
+					}
+				},
+				include: { sales: true }
 			});
 
-			if (!product) {
-				return fail(404, { error: 'Product not found' });
-			}
-
-			if (product.stock < quantity) {
-				return fail(400, { error: 'Insufficient stock' });
-			}
-
-			const total = product.price * quantity;
-
-			await prisma.$transaction([
-				prisma.sale.create({
-					data: {
-						productId,
-						quantity,
-						total
+			// Update stock for each sale and calculate total
+			await Promise.all(
+				batch.sales.map(async sale => {
+					const product = await prisma.product.findUnique({ where: { id: sale.productId } });
+					if (product) {
+						const total = product.price * sale.quantity;
+						await prisma.product.update({
+							where: { id: product.id },
+							data: { stock: { decrement: sale.quantity } }
+						});
+						await prisma.sale.update({
+							where: { id: sale.id },
+							data: { total }
+						});
 					}
-				}),
-				prisma.product.update({
-					where: { id: productId },
-					data: { stock: { decrement: quantity } }
 				})
-			]);
+			);
 		} catch (error) {
-			return fail(500, { error: 'Failed to create sale' });
+			return fail(500, { error: 'Failed to create batch' });
 		}
-	}
+	},
+	// Add similar actions for `updateBatch`, `deleteBatch`, `updateSale`, and `deleteSale` if needed.
 } satisfies Actions;

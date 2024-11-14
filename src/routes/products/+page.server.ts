@@ -1,6 +1,8 @@
-import { prisma } from '$lib/server/db';
+import { PrismaClient } from '@prisma/client';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+
+const prisma = new PrismaClient();
 
 export const load: PageServerLoad = async () => {
     const products = await prisma.product.findMany({
@@ -13,12 +15,11 @@ export const actions = {
     create: async ({ request }: { request: Request }) => {
         const data = await request.formData();
         const name = data.get('name')?.toString();
-        const sku = data.get('sku')?.toString();
         const price = parseFloat(data.get('price')?.toString() || '0');
         const stock = parseInt(data.get('stock')?.toString() || '0');
         const description = data.get('description')?.toString();
 
-        if (!name || !sku || !price) {
+        if (!name || !price) {
             return fail(400, { error: 'Missing required fields' });
         }
 
@@ -26,7 +27,6 @@ export const actions = {
             await prisma.product.create({
                 data: {
                     name,
-                    sku,
                     price,
                     stock,
                     description

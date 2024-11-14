@@ -14,10 +14,10 @@
 	import { Label } from '$lib/components/ui/label';
     import * as Dialog from '$lib/components/ui/dialog';
     
-    import { PackagePlus } from "lucide-svelte";
+    import { PackagePlus, Plus } from "lucide-svelte";
     
 	import type { PageData } from './$types';
-	import Header from '../Header.svelte';
+	import NumberField from '$lib/components/custom/numberField/number-field.svelte';
 
 	export let data: PageData;
 
@@ -27,45 +27,45 @@
 <div class="space-y-6">
 	<div class="flex items-center justify-between">
 		<h2 class="text-3xl font-bold tracking-tight">Products</h2>
-		<Button on:click={() => (showForm = !showForm)}>
-			{showForm ? 'Cancel' : 'Add Product'}
-		</Button>
+        <Dialog.Root>
+			<Dialog.Trigger>
+				<div class="flex items-center">
+					<Plus class="mr-2 h-4 w-4" /> Add Product
+				</div>
+			</Dialog.Trigger>
+			<Dialog.Content class="w-full max-w-2xl">
+                <form method="POST" action="?/create" use:enhance class="space-y-4 bg-card p-4 rounded-lg">
+                    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="space-y-2 lg:col-span-2">
+                            <Label for="name">Name</Label>
+                            <Input id="name" name="name" required />
+                        </div>
+                        <div class="space-y-2">
+                            <Label for="price">Price</Label>
+                            <Input id="price" name="price" type="number" step="0.01" required />
+                        </div>
+                        <div class="space-y-2">
+                            <Label for="stock">Stock</Label>
+                            <NumberField id="stock" name="stock" min={0} max={1000000} required />
+                        </div>
+                        <div class="col-span-2 space-y-2">
+                            <Label for="description">Description</Label>
+                            <Input id="description" name="description" />
+                        </div>
+                    </div>
+                    <Dialog.Footer>
+                        <Button variant="default" type="submit">Save Product</Button>
+                    </Dialog.Footer>
+                </form>
+			</Dialog.Content>
+		</Dialog.Root>
 	</div>
-
-	{#if showForm}
-		<form method="POST" action="?/create" use:enhance class="space-y-4 bg-card p-4 rounded-lg">
-			<div class="grid grid-cols-2 gap-4">
-				<div class="space-y-2">
-					<Label for="name">Name</Label>
-					<Input id="name" name="name" required />
-				</div>
-				<div class="space-y-2">
-					<Label for="sku">SKU</Label>
-					<Input id="sku" name="sku" required />
-				</div>
-				<div class="space-y-2">
-					<Label for="price">Price</Label>
-					<Input id="price" name="price" type="number" step="0.01" required />
-				</div>
-				<div class="space-y-2">
-					<Label for="stock">Stock</Label>
-					<Input id="stock" name="stock" type="number" required />
-				</div>
-				<div class="col-span-2 space-y-2">
-					<Label for="description">Description</Label>
-					<Input id="description" name="description" />
-				</div>
-			</div>
-			<Button type="submit">Save Product</Button>
-		</form>
-	{/if}
 
 	<div class="rounded-md border">
 		<Table>
 			<TableHeader>
 				<TableRow>
 					<TableHead>Name</TableHead>
-					<TableHead>SKU</TableHead>
 					<TableHead class="text-right">Price</TableHead>
 					<TableHead class="text-right">Stock</TableHead>
 					<TableHead class="text-right"></TableHead>
@@ -75,7 +75,6 @@
 				{#each data.products as product}
 					<TableRow>
 						<TableCell>{product.name}</TableCell>
-						<TableCell>{product.sku}</TableCell>
 						<TableCell class="text-right">{product.price.toLocaleString('en-US')}</TableCell>
 						<TableCell class="text-right">{product.stock}</TableCell>
 						<TableCell>
@@ -102,7 +101,8 @@
                                             <div class="grid gap-4 py-4">
                                                 <div class="grid items-center gap-4">
                                                     <Label for="quantity">Quantity to stock</Label>
-                                                    <Input id="quantity" name="quantity" type="number" min="1" required />
+                                                    <!-- <Input id="quantity" name="quantity" type="number" min="1" required /> -->
+                                                    <NumberField name="quantity" min={1} max={product.stock} />
                                                 </div>
                                             </div>
                                             <Dialog.Footer>

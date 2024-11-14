@@ -1,32 +1,48 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+    provider = "sqlite"
+    url      = env("DATABASE_URL")
 }
 
-model Product {
-  id          Int      @id @default(autoincrement())
-  name        String
-  sku         String   @unique
-  description String?
-  price       Float
-  stock       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  sales       Sale[]
+model User {
+    id            Int     @id @default(autoincrement())
+    email         String  @unique
+    username      String  @unique
+    firstName     String?
+    lastName      String?
+    superuser     Boolean @default(false)
+    active        Boolean @default(false)
+    passwordHash  String
+}
+
+model SaleBatch {
+    id          Int      @id @default(autoincrement())
+    sales       Sale[]   @relation("BatchSales")
+    createdAt   DateTime @default(now())
+    date        DateTime
+    description String?
 }
 
 model Sale {
-  id        Int      @id @default(autoincrement())
-  quantity  Int
-  total     Float
-  createdAt DateTime @default(now())
-  product   Product  @relation(fields: [productId], references: [id])
-  productId Int
+    id        Int       @id @default(autoincrement())
+    quantity  Int
+    total     Float
+    productId Int
+    product   Product   @relation(fields: [productId], references: [id])
+    batchId   Int
+    batch     SaleBatch @relation("BatchSales", fields: [batchId], references: [id])
+}
+
+model Product {
+    id          Int      @id @default(autoincrement())
+    name        String
+    description String?
+    price       Float
+    stock       Int      @default(0)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    sales       Sale[]
 }
