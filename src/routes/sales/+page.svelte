@@ -14,16 +14,19 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import * as Dialog from '$lib/components/ui/dialog';
-    
-    import NumberField from '$lib/components/custom/numberField/number-field.svelte';
+	import * as Collapsible from '$lib/components/ui/collapsible';
+
+	import NumberField from '$lib/components/custom/numberField/number-field.svelte';
 
 	import SelectCombo from './SelectCombo.svelte';
 	import DatePicker from './DatePicker.svelte';
 
-	import { Plus } from 'lucide-svelte';
+	import { timeSince } from '$lib/stores/TimeSinceStore';
 
-	import type { Product } from '@prisma/client';
-    import { type DateValue } from '@internationalized/date';
+	import { Plus, Trash2, CircleArrowOutUpRight } from 'lucide-svelte';
+
+	import type { Product, SaleBatch } from '@prisma/client';
+	import { type CalendarDate, today, getLocalTimeZone } from '@internationalized/date';
 
 	export let data: PageData;
 
@@ -32,32 +35,67 @@
 	$: productId = selectedProduct?.id;
 	$: stock = selectedProduct?.stock || 0;
 
-	let batchDate: DateValue | undefined = undefined;
+	let batchDate: CalendarDate = today(getLocalTimeZone());
 	let batchDescription = '';
-	let sales = [];
 	let selectedProduct: Product | null = null;
 	let quantity = 0;
 	let maxQuantity = 0;
 
-    $: if (selectedProduct) {
-		maxQuantity = selectedProduct.stock;  // Bind maxQuantity when product is selected
+	interface SaleInterface {
+		productId: number;
+		quantity: number;
+		total: number;
+	}
+
+	let batchSales: SaleInterface[] = [];
+	let batchSalesLength: number = 0;
+
+	$: batchSalesString = JSON.stringify(batchSales);
+
+	$: if (selectedProduct) {
+		maxQuantity = selectedProduct.stock; // Bind maxQuantity when product is selected
 	}
 
 	const addSale = () => {
-        console.log('selectedProduct', selectedProduct);
-        console.log('quantity', quantity);
-        return
 		if (selectedProduct && quantity > 0) {
-			sales.push({
-				productId: selectedProduct.id,
-				productName: selectedProduct.name,
-				quantity,
-				stock: selectedProduct.stock
-			});
+			const existingSale = batchSales.find((sale) => sale.productId === selectedProduct?.id);
+
+			if (existingSale) {
+                // If the product already exists in the sales list, update its quantity
+				existingSale.quantity += quantity;
+				existingSale.total = selectedProduct.price * existingSale.quantity; // Recalculate total
+                batchSales = [...batchSales];
+			} else {
+				// Otherwise, add a new sale to the batch
+				const newSale = {
+					productId: selectedProduct.id,
+					quantity,
+					total: selectedProduct.price * quantity
+				};
+				batchSales = [...batchSales, newSale];
+			}
+
+			// Reset fields
 			selectedProduct = null;
 			quantity = 0;
+			batchSalesLength = batchSales.length;
+
+			console.log(batchSales);
 		}
 	};
+
+	function findProductById(productId: number): Product | undefined {
+		let prod = data.products.find((p) => p.id === productId);
+		return prod;
+	}
+
+	function getBatchTotal(batch: any): string {
+		let total = 0;
+		for (let sale of batch.sales) {
+			total += sale.total;
+		}
+		return total.toLocaleString('en-US');
+	}
 </script>
 
 <div class="space-y-6">
@@ -70,107 +108,97 @@
 				</div>
 			</Dialog.Trigger>
 			<Dialog.Content class="w-full max-w-2xl">
-				<form
-					method="POST"
-					action="?/createBatch"
-					use:enhance
-					class="space-y-4"
-				>
+				<form method="POST" action="?/createBatch" use:enhance class="space-y-4">
 					<div class="grid gap-2 lg:grid-cols-2">
 						<div>
-                            <Label for="batchDate">Date*</Label>
-                            <Input class="hidden" id="batchDate" name="date" type="date" bind:value={batchDate} required />
-                            <br>
-							<DatePicker />
+							<Label for="batchDate">Date*</Label>
+							<br />
+							<DatePicker bind:value={batchDate} />
 						</div>
-                        <div>
-                            <Label for="batchDescription">Description</Label>
-                            <Input
-                                id="batchDescription"
-                                name="description"
-                                type="text"
-                                bind:value={batchDescription}
-                            />
-                        </div>
+						<div>
+							<Label for="batchDescription">Description</Label>
+							<Input
+								id="batchDescription"
+								name="description"
+								type="text"
+								bind:value={batchDescription}
+							/>
+						</div>
 					</div>
 
 					<div class="space-y-4">
 						<h3 class="text-xl">Add Sales to Batch</h3>
 						<div class="flex gap-4">
 							<SelectCombo products={data.products} bind:selectedProduct />
-                            <NumberField name="quantity" min={1} bind:max={maxQuantity} bind:value={quantity} />
-							<Input
-								type="number"
-								bind:value={quantity}
-								min="1"
-								max={selectedProduct?.stock || 1}
-								placeholder="Quantity"
-							/>
-							<Button type="button" on:click={addSale}>Add Sale</Button>
+							<NumberField name="" min={1} bind:max={maxQuantity} bind:value={quantity} />
+							<Button variant="secondary" type="button" on:click={addSale}>Add Sale</Button>
 						</div>
 
-						{#if sales.length > 0}
-							<div class="mt-4">
-								<h4 class="text-lg">Sales in this Batch</h4>
-								<ul>
-									{#each sales as sale}
-										<li>{sale.productName} - Quantity: {sale.quantity}</li>
-									{/each}
-								</ul>
-							</div>
-						{/if}
+						<div class="mt-4">
+							{#if batchSalesLength > 0}
+								<Table>
+									<TableBody>
+										{#each batchSales as sale}
+											<TableRow>
+												<TableCell>{findProductById(sale.productId)?.name}</TableCell>
+												<TableCell class="text-right">{sale.quantity}</TableCell>
+												<TableCell class="text-right"
+													>{sale.total.toLocaleString('en-US')}</TableCell
+												>
+												<TableCell>
+													<div class="flex justify-end">
+														<Button variant="outline" size="iconSm" type="button">
+															<Trash2 class="h-4 w-4" />
+														</Button>
+													</div>
+												</TableCell>
+											</TableRow>
+										{/each}
+									</TableBody>
+								</Table>
+							{:else}
+								<p>No sales added yet.</p>
+							{/if}
+						</div>
 					</div>
 
-					<input type="hidden" name="sales" value={JSON.stringify(sales)} />
-					<Button type="submit">Create Batch</Button>
+					<input type="text" class="hidden" name="sales" value={JSON.stringify(batchSales)} />
+					<Dialog.Footer class="mt-8">
+						<Button type="submit">Create Batch</Button>
+					</Dialog.Footer>
 				</form>
 			</Dialog.Content>
 		</Dialog.Root>
 	</div>
 
-	{#if showForm}
-		<form
-			method="POST"
-			action="?/create"
-			use:enhance
-			class="space-y-4 rounded-lg border bg-card p-4"
-		>
-			<div class="grid grid-cols-2 gap-4">
-				<div class="space-y-2">
-					<Label for="productId">Product</Label>
-					<br />
-					<SelectCombo products={data.products} bind:selectedProduct />
-					<input type="text" class="hidden" name="productId" bind:value={productId} required />
-				</div>
-				<div class="space-y-2">
-					<Label for="quantity">Quantity</Label>
-					<Input id="quantity" name="quantity" type="number" min="1" max={stock} required />
-				</div>
-			</div>
-			<Button type="submit">Create Sale</Button>
-		</form>
-	{/if}
-
 	<div class="rounded-md border">
-		<Table>
-			<TableHeader>
-				<TableRow>
-					<TableHead>Product</TableHead>
-					<TableHead>Quantity</TableHead>
-					<TableHead>Total</TableHead>
-					<TableHead>Date</TableHead>
-				</TableRow>
-			</TableHeader>
-			<TableBody>
-				{#each data.sales as sale}
+		{#if data.saleBatches.length > 0}
+			<Table>
+				<TableHeader>
 					<TableRow>
-						<TableCell>{sale.product.name}</TableCell>
-						<TableCell>{sale.quantity}</TableCell>
-						<TableCell>{sale.total.toLocaleString('en-US')}</TableCell>
-						<TableCell>{new Date(sale.createdAt).toLocaleDateString()}</TableCell>
+						<TableHead>Date</TableHead>
+						<TableHead>Description</TableHead>
+						<TableHead class="text-right">Total</TableHead>
+						<TableHead></TableHead>
 					</TableRow>
-				{/each}
-			</TableBody>
-		</Table>
+				</TableHeader>
+				<TableBody>
+					{#each data.saleBatches.slice().reverse() as batch}
+						<TableRow>
+							<TableCell>{batch.date.toLocaleString('en-US', { dateStyle: 'long' })}</TableCell>
+							<TableCell>{batch.description}</TableCell>
+							<TableCell class="text-right">{getBatchTotal(batch)}</TableCell>
+							<TableCell>
+								<Button variant="outline" size="iconSm" type="button">
+									<CircleArrowOutUpRight class="h-4 w-4" />
+								</Button>
+							</TableCell>
+						</TableRow>
+					{/each}
+				</TableBody>
+			</Table>
+		{:else}
+			No sales yet
+		{/if}
 	</div>
 </div>
