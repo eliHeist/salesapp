@@ -14,14 +14,12 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import * as Collapsible from '$lib/components/ui/collapsible';
 
 	import NumberField from '$lib/components/custom/numberField/number-field.svelte';
 
 	import SelectCombo from './SelectCombo.svelte';
 	import DatePicker from './DatePicker.svelte';
 
-	import { timeSince } from '$lib/stores/TimeSinceStore';
 
 	import { Plus, Trash2, CircleArrowOutUpRight } from 'lucide-svelte';
 
@@ -189,9 +187,11 @@
 							<TableCell>{batch.description}</TableCell>
 							<TableCell class="text-right">{getBatchTotal(batch)}</TableCell>
 							<TableCell>
-								<Button variant="outline" size="iconSm" type="button">
-									<CircleArrowOutUpRight class="h-4 w-4" />
-								</Button>
+                                <div class="flex justify-end">
+                                    <Button variant="outline" size="iconSm" type="button">
+                                        <CircleArrowOutUpRight class="h-4 w-4" />
+                                    </Button>
+                                </div>
 							</TableCell>
 						</TableRow>
 					{/each}
