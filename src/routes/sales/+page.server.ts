@@ -1,24 +1,48 @@
 import { PrismaClient } from '@prisma/client';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+import { startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
+ 
 
 const prisma = new PrismaClient();
 
+// +page.server.ts
+
 export const load: PageServerLoad = async () => {
-	const [products, saleBatches] = await Promise.all([
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+	const startOfCurrentWeek = startOfWeek(today, { weekStartsOn: 1 }); // Assuming week starts on Monday
+	const endOfCurrentWeek = endOfWeek(today, { weekStartsOn: 1 });
+
+	const [products, todaysSales, earlierSales] = await Promise.all([
 		prisma.product.findMany({
 			where: { stock: { gt: 0 } }
 		}),
 		prisma.saleBatch.findMany({
-            orderBy: [ { date: 'asc' }, ],
+            where: {
+                date: {
+                    gte: yesterday,
+                },
+            },
+            orderBy: { date: 'asc' },
             include: { sales: { include: { product: true } } }
-		})
+		}),
+		prisma.saleBatch.findMany({
+            where: {
+                date: {
+                    gte: startOfCurrentWeek,
+                    lte: yesterday,
+                },
+            },
+            orderBy: { date: 'asc' },
+            include: { sales: { include: { product: true } } }
+		}),
     ]);
-    
-    // console.log(saleBatches)
 
-	return { products, saleBatches };
+	return { products, todaysSales, earlierSales };
 };
+
 
 export const actions = {
 	createBatch: async ({ request }) => {

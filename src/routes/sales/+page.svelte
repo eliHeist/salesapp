@@ -14,21 +14,18 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import * as Dialog from '$lib/components/ui/dialog';
-
 	import NumberField from '$lib/components/custom/numberField/number-field.svelte';
 
 	import SelectCombo from './SelectCombo.svelte';
 	import DatePicker from './DatePicker.svelte';
 
-
-	import { Plus, Trash2, CircleArrowOutUpRight } from 'lucide-svelte';
+	import { Plus, Trash2, CircleArrowOutUpRight, CircuitBoard, Download } from 'lucide-svelte';
 
 	import type { Product, SaleBatch } from '@prisma/client';
 	import { type CalendarDate, today, getLocalTimeZone } from '@internationalized/date';
+	import DetailView from './DetailView.svelte';
 
 	export let data: PageData;
-
-	let showForm = false;
 
 	$: productId = selectedProduct?.id;
 	$: stock = selectedProduct?.stock || 0;
@@ -59,10 +56,10 @@
 			const existingSale = batchSales.find((sale) => sale.productId === selectedProduct?.id);
 
 			if (existingSale) {
-                // If the product already exists in the sales list, update its quantity
+				// If the product already exists in the sales list, update its quantity
 				existingSale.quantity += quantity;
 				existingSale.total = selectedProduct.price * existingSale.quantity; // Recalculate total
-                batchSales = [...batchSales];
+				batchSales = [...batchSales];
 			} else {
 				// Otherwise, add a new sale to the batch
 				const newSale = {
@@ -169,36 +166,154 @@
 		</Dialog.Root>
 	</div>
 
-	<div class="rounded-md border">
-		{#if data.saleBatches.length > 0}
-			<Table>
-				<TableHeader>
-					<TableRow>
-						<TableHead>Date</TableHead>
-						<TableHead>Description</TableHead>
-						<TableHead class="text-right">Total</TableHead>
-						<TableHead></TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					{#each data.saleBatches.slice().reverse() as batch}
+	<div class="grid gap-4 md:grid-cols-2">
+		<div class="grid content-start rounded-md border">
+			<h2 class="my-4 text-center text-xl font-medium text-muted-foreground">Today</h2>
+			{#if data.todaysSales.length > 0}
+				<Table>
+					<TableHeader>
 						<TableRow>
-							<TableCell>{batch.date.toLocaleString('en-US', { dateStyle: 'long' })}</TableCell>
-							<TableCell>{batch.description}</TableCell>
-							<TableCell class="text-right">{getBatchTotal(batch)}</TableCell>
-							<TableCell>
-                                <div class="flex justify-end">
-                                    <Button variant="outline" size="iconSm" type="button">
-                                        <CircleArrowOutUpRight class="h-4 w-4" />
-                                    </Button>
-                                </div>
-							</TableCell>
+							<TableHead>Items</TableHead>
+							<TableHead>Description</TableHead>
+							<TableHead class="text-right">Total</TableHead>
+							<TableHead></TableHead>
 						</TableRow>
-					{/each}
-				</TableBody>
-			</Table>
-		{:else}
-			No sales yet
-		{/if}
+					</TableHeader>
+					<TableBody>
+						{#each data.todaysSales.slice().reverse() as batch}
+							<TableRow>
+								<TableCell>{batch.sales.length}</TableCell>
+								<TableCell>{batch.description}</TableCell>
+								<TableCell class="text-right">{getBatchTotal(batch)}</TableCell>
+								<TableCell>
+									<div class="flex justify-end">
+										<a href="/sales/{batch.id}/receipt">
+											<Button variant="outline" size="iconSm" type="button">
+												<Download class="h-4 w-4" />
+											</Button>
+										</a>
+										<Dialog.Root>
+											<Dialog.Trigger>
+												<Button variant="outline" size="iconSm" type="button">
+													<CircleArrowOutUpRight class="h-4 w-4" />
+												</Button>
+											</Dialog.Trigger>
+											<Dialog.Content class="w-full max-w-2xl">
+												<div class="flex gap-x-1">
+                                                    <span class="font-semibold">Date:</span>
+                                                    <p>{batch.date.toLocaleString('en-US', { dateStyle: 'long' })}</p>
+                                                </div>
+                                                <div class="flex gap-x-1">
+                                                    <span class="font-semibold">Description:</span>
+                                                    <p>{batch.description}</p>
+                                                </div>
+                                                <div class="flex gap-x-1">
+                                                    <span class="font-semibold">Total:</span>
+                                                    <p>{getBatchTotal(batch)}</p>
+                                                </div>
+                                                <div class="grid gap-2">
+                                                    <span class="font-semibold">Items</span>
+                                                    <ul>
+                                                        {#each batch.sales as sale}
+                                                            <li class="flex justify-between">
+                                                                <p>
+                                                                    {sale.quantity}
+                                                                    {findProductById(sale.productId)?.name}
+                                                                </p>
+                                                                <p>{sale.total.toLocaleString('en-US')}</p>
+                                                            </li>
+                                                        {/each}
+                                                    </ul>
+                                                </div>
+											</Dialog.Content>
+										</Dialog.Root>
+									</div>
+								</TableCell>
+							</TableRow>
+						{/each}
+					</TableBody>
+				</Table>
+			{:else}
+				<p class="m-auto p-4 text-center">
+					<CircuitBoard class="mx-auto mb-8 h-20 w-20 rotate-45 opacity-20" />
+					No sales today
+				</p>
+			{/if}
+		</div>
+		<div class="grid content-start rounded-md border">
+			{#if data.earlierSales.length > 0}
+				<h2 class="my-4 text-center text-xl font-medium text-muted-foreground">
+					Earlier this week
+				</h2>
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead>Date</TableHead>
+							<TableHead>Description</TableHead>
+							<TableHead class="text-right">Total</TableHead>
+							<TableHead></TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{#each data.earlierSales.slice().reverse() as batch}
+							<TableRow>
+								<TableCell>{batch.date.toLocaleString('en-US', { dateStyle: 'long' })}</TableCell>
+								<TableCell>{batch.description}</TableCell>
+								<TableCell class="text-right">{getBatchTotal(batch)}</TableCell>
+								<TableCell>
+									<div class="flex justify-end">
+										<a href="/sales/{batch.id}/receipt">
+											<Button variant="outline" size="iconSm" type="button">
+												<Download class="h-4 w-4" />
+											</Button>
+										</a>
+										<Dialog.Root>
+											<Dialog.Trigger>
+												<Button variant="outline" size="iconSm" type="button">
+													<CircleArrowOutUpRight class="h-4 w-4" />
+												</Button>
+											</Dialog.Trigger>
+											<Dialog.Content class="w-full max-w-2xl">
+												<div class="flex gap-x-1">
+                                                    <span class="font-semibold">Date:</span>
+                                                    <p>{batch.date.toLocaleString('en-US', { dateStyle: 'long' })}</p>
+                                                </div>
+                                                <div class="flex gap-x-1">
+                                                    <span class="font-semibold">Description:</span>
+                                                    <p>{batch.description}</p>
+                                                </div>
+                                                <div class="flex gap-x-1">
+                                                    <span class="font-semibold">Total:</span>
+                                                    <p>{getBatchTotal(batch)}</p>
+                                                </div>
+                                                <div class="grid gap-2">
+                                                    <span class="font-semibold">Items</span>
+                                                    <ul>
+                                                        {#each batch.sales as sale}
+                                                            <li class="flex justify-between">
+                                                                <p>
+                                                                    {sale.quantity}
+                                                                    {findProductById(sale.productId)?.name}
+                                                                </p>
+                                                                <p>{sale.total.toLocaleString('en-US')}</p>
+                                                            </li>
+                                                        {/each}
+                                                    </ul>
+                                                </div>
+											</Dialog.Content>
+										</Dialog.Root>
+									</div>
+								</TableCell>
+							</TableRow>
+						{/each}
+					</TableBody>
+				</Table>
+			{:else}
+				<p class="m-auto p-4 text-center">
+					<CircuitBoard class="mx-auto mb-8 h-20 w-20 rotate-45 opacity-20" />
+					No sales earlier this week
+				</p>
+			{/if}
+		</div>
 	</div>
 </div>

@@ -43,10 +43,12 @@
 		"@oslojs/encoding": "^1.1.0",
 		"@oslojs/otp": "^1.0.0",
 		"@prisma/client": "^5.22.0",
+		"date-fns": "^4.1.0",
 		"jsonwebtoken": "^9.0.2",
 		"lucide-svelte": "^0.456.0",
 		"mode-watcher": "^0.4.1",
 		"nodemailer": "^6.9.16",
+		"pdf-lib": "^1.17.1",
 		"prisma": "^5.22.0",
 		"sass": "^1.80.6",
 		"uqr": "^0.1.2"
