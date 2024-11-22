@@ -19,6 +19,7 @@
 	<input
 		class="w-full grow bg-background px-3 py-2 text-center tabular-nums text-foreground focus:outline-none"
         bind:value
+        type="number"
         name={name}
         min={min}
         max={max}

@@ -1,6 +1,15 @@
 <script lang="ts">
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import { ArrowUpRight, ArrowDownRight, Package, DollarSign, Users, TrendingUp } from 'lucide-svelte';
+    import type { PageData } from './$types';
+
+    export let data:PageData;
+
+    let totalRevenue = 0;
+    let totalProducts = data.products.length;
+    let totalUsers = data.users;
+    let totalSales = data.sales.length;
+    let recentItems = data.recentItems
 </script>
 
 <div class="space-y-8">
@@ -18,7 +27,7 @@
 				<DollarSign class="h-4 w-4 text-muted-foreground" />
 			</CardHeader>
 			<CardContent>
-				<div class="text-2xl font-bold">$45,231.89</div>
+				<div class="text-2xl font-bold">UGX {totalRevenue.toLocaleString('en-US')}</div>
 				<div class="flex items-center space-x-2 text-sm text-green-600">
 					<ArrowUpRight class="h-4 w-4" />
 					<span>+20.1%</span>
@@ -31,7 +40,7 @@
 				<Package class="h-4 w-4 text-muted-foreground" />
 			</CardHeader>
 			<CardContent>
-				<div class="text-2xl font-bold">2,350</div>
+				<div class="text-2xl font-bold">{totalProducts.toLocaleString('en-US')}</div>
 				<div class="flex items-center space-x-2 text-sm text-red-600">
 					<ArrowDownRight class="h-4 w-4" />
 					<span>-4.5%</span>
@@ -44,7 +53,7 @@
 				<TrendingUp class="h-4 w-4 text-muted-foreground" />
 			</CardHeader>
 			<CardContent>
-				<div class="text-2xl font-bold">12,234</div>
+				<div class="text-2xl font-bold">{totalSales.toLocaleString('en-US')}</div>
 				<div class="flex items-center space-x-2 text-sm text-green-600">
 					<ArrowUpRight class="h-4 w-4" />
 					<span>+19%</span>
@@ -57,7 +66,7 @@
 				<Users class="h-4 w-4 text-muted-foreground" />
 			</CardHeader>
 			<CardContent>
-				<div class="text-2xl font-bold">573</div>
+				<div class="text-2xl font-bold">{totalUsers.toLocaleString('en-US')}</div>
 				<div class="flex items-center space-x-2 text-sm text-green-600">
 					<ArrowUpRight class="h-4 w-4" />
 					<span>+201</span>
@@ -83,13 +92,13 @@
 			</CardHeader>
 			<CardContent>
 				<div class="space-y-8">
-					{#each Array(5) as _}
+					{#each recentItems as item}
 						<div class="flex items-center">
 							<div class="space-y-1">
-								<p class="text-sm font-medium leading-none">Product Name</p>
+								<p class="text-sm font-medium leading-none">{item.name}</p>
 								<p class="text-sm text-muted-foreground">2 hours ago</p>
 							</div>
-							<div class="ml-auto font-medium">+$250.00</div>
+							<div class="ml-auto font-medium">{item.total}</div>
 						</div>
 					{/each}
 				</div>

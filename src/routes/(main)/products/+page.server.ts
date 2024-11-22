@@ -1,10 +1,15 @@
 import { PrismaClient } from '@prisma/client';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+import { redirect } from '@sveltejs/kit'
 
 const prisma = new PrismaClient();
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals }) => {
+    // redirect user if not logged in
+    if (!locals.user) {
+        redirect(302, '/auth/login')
+    }
     const products = await prisma.product.findMany({
         orderBy: { createdAt: 'desc' }
     });

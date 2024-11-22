@@ -1,5 +1,5 @@
 <script lang="ts">
-	import '../app.scss';
+	import '../../app.scss';
 	import { ModeWatcher } from 'mode-watcher';
 	import { Menu } from 'lucide-svelte';
 	import SideBar from './SideBar.svelte';

@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
  
@@ -8,7 +8,11 @@ const prisma = new PrismaClient();
 
 // +page.server.ts
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals }) => {
+    // redirect user if not logged in
+    if (!locals.user) {
+        redirect(302, '/auth/login')
+    }
     const today = new Date();
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
