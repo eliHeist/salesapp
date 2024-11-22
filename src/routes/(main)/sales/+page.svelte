@@ -122,11 +122,11 @@
 					</div>
 
 					<div class="space-y-4">
-						<h3 class="text-xl">Add Sales to Batch</h3>
+						<h3 class="text-xl">Add items to Sale</h3>
 						<div class="flex gap-4">
 							<SelectCombo products={data.products} bind:selectedProduct />
 							<NumberField name="" min={1} bind:max={maxQuantity} bind:value={quantity} />
-							<Button variant="secondary" type="button" on:click={addSale}>Add Sale</Button>
+							<Button variant="secondary" type="button" on:click={addSale}>Add Item</Button>
 						</div>
 
 						<div class="mt-4">
@@ -152,14 +152,18 @@
 									</TableBody>
 								</Table>
 							{:else}
-								<p>No sales added yet.</p>
+								<p>No items added yet.</p>
 							{/if}
 						</div>
 					</div>
 
 					<input type="text" class="hidden" name="sales" value={JSON.stringify(batchSales)} />
 					<Dialog.Footer class="mt-8">
-						<Button type="submit">Create Batch</Button>
+                        {#if batchSalesLength > 0}
+						    <Button type="submit">Create Sale</Button>
+                        {:else}
+						    <Button variant="ghost" type="button" disabled>Create Sale</Button>
+                        {/if}
 					</Dialog.Footer>
 				</form>
 			</Dialog.Content>
