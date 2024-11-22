@@ -8,7 +8,7 @@
 
 <aside class="hidden lg:flex h-screen w-64 flex-col fixed left-0 border-r">
     <div class="p-6 flex items-center justify-center">
-        <h1 class="font-bold text-2xl">Stock Manager</h1>
+        <h1 class="font-bold text-2xl">Minatrox</h1>
     </div>
     <nav class="flex-1 space-y-2 p-4">
         <SideBarNav />
@@ -22,7 +22,7 @@
         <Button class="lg:hidden { open ? 'scale-100' : 'scale-0' } transition-all delay-300" variant="ghost" type="button" size="icon" on:click={() => {open = false}}>
             <X class="h-5 w-5" />
         </Button>
-        <h1 class="font-bold text-2xl">Stock Manager</h1>
+        <h1 class="font-bold text-2xl">Minatrox</h1>
     </div>
     <nav class="flex-1 space-y-2 p-4">
         <SideBarNav />

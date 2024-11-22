@@ -17,7 +17,7 @@
             <Button class="lg:hidden" variant="ghost" type="button" size="icon" on:click={() => {open = true}}>
                 <Menu class="h-6 w-6" />
             </Button>
-			<span class="font-bold text-lg">Stock Manager</span>
+			<span class="font-bold text-lg">Minatrox</span>
 		</div>
 	</header>
 

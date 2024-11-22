@@ -28,7 +28,7 @@
 			</CardHeader>
 			<CardContent>
 				<div class="text-2xl font-bold">UGX {totalRevenue.toLocaleString('en-US')}</div>
-				<div class="flex items-center space-x-2 text-sm text-green-600">
+				<div class="hidden items-center space-x-2 text-sm text-green-600">
 					<ArrowUpRight class="h-4 w-4" />
 					<span>+20.1%</span>
 				</div>
@@ -41,7 +41,7 @@
 			</CardHeader>
 			<CardContent>
 				<div class="text-2xl font-bold">{totalProducts.toLocaleString('en-US')}</div>
-				<div class="flex items-center space-x-2 text-sm text-red-600">
+				<div class="hidden items-center space-x-2 text-sm text-red-600">
 					<ArrowDownRight class="h-4 w-4" />
 					<span>-4.5%</span>
 				</div>
@@ -54,7 +54,7 @@
 			</CardHeader>
 			<CardContent>
 				<div class="text-2xl font-bold">{totalSales.toLocaleString('en-US')}</div>
-				<div class="flex items-center space-x-2 text-sm text-green-600">
+				<div class="hidden items-center space-x-2 text-sm text-green-600">
 					<ArrowUpRight class="h-4 w-4" />
 					<span>+19%</span>
 				</div>
@@ -67,7 +67,7 @@
 			</CardHeader>
 			<CardContent>
 				<div class="text-2xl font-bold">{totalUsers.toLocaleString('en-US')}</div>
-				<div class="flex items-center space-x-2 text-sm text-green-600">
+				<div class="hidden items-center space-x-2 text-sm text-green-600">
 					<ArrowUpRight class="h-4 w-4" />
 					<span>+201</span>
 				</div>
