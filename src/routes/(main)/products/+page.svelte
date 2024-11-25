@@ -14,7 +14,7 @@
 	import { Label } from '$lib/components/ui/label';
     import * as Dialog from '$lib/components/ui/dialog';
     
-    import { PackagePlus, Plus } from "lucide-svelte";
+    import { Plus, ArrowBigRightDash } from "lucide-svelte";
     
 	import type { PageData } from './$types';
 	import NumberField from '$lib/components/custom/numberField/number-field.svelte';
@@ -61,6 +61,41 @@
 		</Dialog.Root>
 	</div>
 
+    <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-16">
+        <div class="grid gap-2 bg-muted/30 hover:bg-muted/50 p-6 rounded-lg">
+            <h3 class=" font-semibold text-lg">Total Products</h3>
+            <p class="text-6xl font-bold">{data.products.length.toLocaleString("en-US")}</p>
+        </div>
+        <div class="grid gap-2 bg-muted/30 hover:bg-muted/50 p-6 rounded-lg">
+            <h3 class=" font-semibold text-lg">Highest Seller</h3>
+            <div>
+                <p></p>
+            </div>
+        </div>
+        <div class="grid gap-2 bg-muted/30 hover:bg-muted/50 p-6 rounded-lg">
+            <h3 class=" font-semibold text-lg">Highest Stock</h3>
+            <div class="flex gap-x-2">
+                <div>
+                    <p class="text-6xl font-bold">{data.productWithMostStock.stock.toLocaleString("en-US")}</p>
+                </div>
+                <div class="grid content-end">
+                    <p class="font-semibold">{data.productWithMostStock.name}</p>
+                </div>
+            </div>
+        </div>
+        <div class="grid gap-2 bg-muted/30 hover:bg-muted/50 p-6 rounded-lg">
+            <h3 class=" font-semibold text-lg">Low Stock</h3>
+            <div class="flex gap-x-2">
+                <div>
+                    <p class="text-6xl font-bold">{data.productsOutOfStock.length.toLocaleString("en-US")}</p>
+                </div>
+                <div class="grid content-end">
+                    <p class="font-semibold"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
 	<div class="rounded-md border">
 		<Table>
 			<TableHeader>
@@ -79,38 +114,12 @@
 						<TableCell class="text-right">{product.stock}</TableCell>
 						<TableCell>
                             <div class="flex justify-end gap-2">
-                                <form class="hidden" method="POST" action="?/delete" use:enhance>
-                                    <input type="hidden" name="id" value={product.id} />
-                                    <Button variant="destructive" size="sm" type="submit">Delete</Button>
-                                </form>
-                                <Dialog.Root>
-                                    <Dialog.Trigger>
-                                        <div class="flex items-center">
-                                            <PackagePlus class="mr-2 h-4 w-4" /> Stock in
-                                        </div>
-                                    </Dialog.Trigger>
-                                    <Dialog.Content>
-                                        <Dialog.Header>
-                                            <Dialog.Title>Add stock for {product.name}.</Dialog.Title>
-                                            <Dialog.Description>
-                                                The current quantity in stock is {product.stock}.
-                                            </Dialog.Description>
-                                        </Dialog.Header>
-                                        <form method="POST" action="?/stock" use:enhance>
-                                            <input type="hidden" name="id" value={product.id} />    
-                                            <div class="grid gap-4 py-4">
-                                                <div class="grid items-center gap-4">
-                                                    <Label for="quantity">Quantity to stock</Label>
-                                                    <!-- <Input id="quantity" name="quantity" type="number" min="1" required /> -->
-                                                    <NumberField name="quantity" min={1} max={product.stock} />
-                                                </div>
-                                            </div>
-                                            <Dialog.Footer>
-                                                <Button type="submit">Save changes</Button>
-                                            </Dialog.Footer>
-                                        </form>
-                                    </Dialog.Content>
-                                </Dialog.Root>
+                                <a href="/products/{product.id}/">
+                                    <Button variant="ghost" size="sm" >
+                                        <ArrowBigRightDash class="mr-1 h-4 w-4" />
+                                        View
+                                    </Button>
+                                </a>
                             </div>
 						</TableCell>
 					</TableRow>

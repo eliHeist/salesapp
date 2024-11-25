@@ -1,59 +1,52 @@
 import { PrismaClient } from '@prisma/client';
-import { fail } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit'
 
 const prisma = new PrismaClient();
 
-export const load: PageServerLoad = async ({ locals }) => {
+let pk: number | null = null
+
+export const load: PageServerLoad = async ({ locals, params }) => {
     // redirect user if not logged in
     if (!locals.user) {
         redirect(302, '/auth/login')
     }
-    const products = await prisma.product.findMany({
-        orderBy: { createdAt: 'desc' }
-    });
 
-    // // Get the product with the most sales
-    // const productWithMostSales = await prisma.product.findFirst({
-    //     include: { sales: true },
-    //     orderBy: {
-    //         sales: {
-    //             _sum: { quantity: 'desc' }
-    //         }
-    //     }
-    // });
+    const { id } = params;
 
-    // Get the product with the most stock
-    const productWithMostStock = await prisma.product.findFirst({
-        orderBy: {
-            stock: 'desc'
-        }
-    });
+    pk = id
 
-    // Get products that are out of stock
-    const productsOutOfStock = await prisma.product.findMany({
-        where: {
-            stock: 0
-        }
-    });
-    return { products, productWithMostStock, productsOutOfStock };
+    const product = await prisma.product.findUnique({
+        where: { id: Number(id) },
+        include: { sales: true }
+    })
+
+    if (!product) {
+        throw error(404, "Product not found")
+    }
+    
+    return { product };
 };
 
 export const actions = {
-    create: async ({ request }: { request: Request }) => {
+    update: async ({ request }: { request: Request }) => {
         const data = await request.formData();
         const name = data.get('name')?.toString();
         const price = parseFloat(data.get('price')?.toString() || '0');
         const stock = parseInt(data.get('stock')?.toString() || '0');
         const description = data.get('description')?.toString();
+        const id = data.get('id')
 
-        if (!name || !price) {
+        if (!name || !price || !id) {
             return fail(400, { error: 'Missing required fields' });
         }
 
         try {
-            await prisma.product.create({
+            await prisma.product.update({
+                where: {
+                    id: Number(id)
+                },
                 data: {
                     name,
                     price,
