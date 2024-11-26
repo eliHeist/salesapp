@@ -1,15 +1,14 @@
 <script lang="ts">
-	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
-	import { ArrowUpRight, ArrowDownRight, Package, DollarSign, Users, TrendingUp } from 'lucide-svelte';
+	import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '$lib/components/ui/card';
+	import { ArrowUpRight, DollarSign, Wallet, TrendingUp } from 'lucide-svelte';
     import type { PageData } from './$types';
+	import SalesCard from './SalesCard.svelte';
+	import RevenueCounter from './RevenueCounter.svelte';
+	import RevenueChart from './RevenueChart.svelte';
+	import SalesBarChart from './SalesBarChart.svelte';
+	import RevenueBarChart from './RevenueBarChart.svelte';
 
     export let data:PageData;
-
-    let totalRevenue = 0;
-    let totalProducts = data.products.length;
-    let totalUsers = data.users;
-    let totalSales = data.sales.length;
-    let recentItems = data.recentItems
 </script>
 
 <div class="space-y-8">
@@ -20,88 +19,55 @@
 		</div>
 	</div>
 
-	<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-		<Card>
+	<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+		<Card class="grid [grid-template-rows:_auto_1fr]">
 			<CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
 				<CardTitle class="text-sm font-medium">Total Revenue</CardTitle>
-				<DollarSign class="h-4 w-4 text-muted-foreground" />
+				<Wallet class="h-4 w-4 text-muted-foreground" />
 			</CardHeader>
-			<CardContent>
-				<div class="text-2xl font-bold">UGX {totalRevenue.toLocaleString('en-US')}</div>
+			<CardContent class="">
+                <div class="grid place-content-center h-full">
+                    <RevenueCounter totalRevenue={data.totalRevenue._sum.total} />
+                </div>
 				<div class="hidden items-center space-x-2 text-sm text-green-600">
 					<ArrowUpRight class="h-4 w-4" />
 					<span>+20.1%</span>
 				</div>
 			</CardContent>
 		</Card>
-		<Card>
-			<CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
-				<CardTitle class="text-sm font-medium">Products in Stock</CardTitle>
-				<Package class="h-4 w-4 text-muted-foreground" />
-			</CardHeader>
-			<CardContent>
-				<div class="text-2xl font-bold">{totalProducts.toLocaleString('en-US')}</div>
-				<div class="hidden items-center space-x-2 text-sm text-red-600">
-					<ArrowDownRight class="h-4 w-4" />
-					<span>-4.5%</span>
-				</div>
-			</CardContent>
+		<Card class="grid [grid-template-rows:_auto_1fr_auto]">
+            <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle class="text-sm font-medium">Most units sold</CardTitle>
+                <TrendingUp class="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <SalesCard totalSales={data.numberOfSales} topSellers={data.topSellingProducts}/>
+            <CardFooter></CardFooter>
 		</Card>
-		<Card>
-			<CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
-				<CardTitle class="text-sm font-medium">Total Sales</CardTitle>
-				<TrendingUp class="h-4 w-4 text-muted-foreground" />
-			</CardHeader>
-			<CardContent>
-				<div class="text-2xl font-bold">{totalSales.toLocaleString('en-US')}</div>
-				<div class="hidden items-center space-x-2 text-sm text-green-600">
-					<ArrowUpRight class="h-4 w-4" />
-					<span>+19%</span>
-				</div>
-			</CardContent>
-		</Card>
-		<Card>
-			<CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
-				<CardTitle class="text-sm font-medium">Active Users</CardTitle>
-				<Users class="h-4 w-4 text-muted-foreground" />
-			</CardHeader>
-			<CardContent>
-				<div class="text-2xl font-bold">{totalUsers.toLocaleString('en-US')}</div>
-				<div class="hidden items-center space-x-2 text-sm text-green-600">
-					<ArrowUpRight class="h-4 w-4" />
-					<span>+201</span>
-				</div>
-			</CardContent>
+		<Card class="grid [grid-template-rows:_auto_1fr_auto]">
+            <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle class="text-sm font-medium">Highest Revenue Earned</CardTitle>
+                <DollarSign class="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+			<RevenueChart totalRevenue={data.totalRevenue._sum.total} topRevenuers={data.topRevenueProducts}/>
+            <CardFooter></CardFooter>
 		</Card>
 	</div>
 
-	<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-		<Card class="lg:col-span-4">
+	<div class="grid gap-4">
+		<Card class="grid [grid-template-rows:_auto_1fr_auto]">
 			<CardHeader>
 				<CardTitle>Sales Overview</CardTitle>
 			</CardHeader>
 			<CardContent>
-				<div class="h-[350px] flex items-center justify-center text-muted-foreground">
-					Sales chart will be implemented here
-				</div>
+                <SalesBarChart salesData={data.saleBatches}/>
 			</CardContent>
 		</Card>
-		<Card class="lg:col-span-3">
+		<Card class="grid [grid-template-rows:_auto_1fr_auto]">
 			<CardHeader>
-				<CardTitle>Recent Sales</CardTitle>
+				<CardTitle>Revenue Overview</CardTitle>
 			</CardHeader>
 			<CardContent>
-				<div class="space-y-8">
-					{#each recentItems as item}
-						<div class="flex items-center">
-							<div class="space-y-1">
-								<p class="text-sm font-medium leading-none">{item.name}</p>
-								<p class="text-sm text-muted-foreground">2 hours ago</p>
-							</div>
-							<div class="ml-auto font-medium">{item.total}</div>
-						</div>
-					{/each}
-				</div>
+                <RevenueBarChart salesData={data.saleBatches}/>
 			</CardContent>
 		</Card>
 	</div>

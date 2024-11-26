@@ -79,6 +79,15 @@
 		}
 	};
 
+    const removeSale = (id: number) => {
+        const existingSale = batchSales.find((sale) => sale.productId === id);
+
+        if (existingSale) {
+            batchSales = batchSales.filter((sale) => sale.productId !== id);
+            batchSalesLength = batchSales.length;
+        }
+    }
+
 	function findProductById(productId: number): Product | undefined {
 		let prod = data.products.find((p) => p.id === productId);
 		return prod;
@@ -98,7 +107,7 @@
 		<h2 class="text-3xl font-bold tracking-tight">Sales</h2>
 		<Dialog.Root>
 			<Dialog.Trigger>
-				<div class="flex items-center">
+				<div class="flex items-center" on:click={() => (batchSales = [])}>
 					<Plus class="mr-2 h-4 w-4" /> New Sale
 				</div>
 			</Dialog.Trigger>
@@ -142,7 +151,7 @@
 												>
 												<TableCell>
 													<div class="flex justify-end">
-														<Button variant="outline" size="iconSm" type="button">
+														<Button variant="outline" size="iconSm" type="button" on:click={() => removeSale(sale.productId)}>
 															<Trash2 class="h-4 w-4" />
 														</Button>
 													</div>

@@ -60,3 +60,12 @@ export const flyAndScale = (
 		easing: cubicOut
 	};
 };
+
+
+// export function getSaleStatsTotal(saleBatch) {
+//     let itemsString = 
+//     for (let index = 0; index < saleBatch.sales.length; index++) {
+//         const element = saleBatch.sales[index];
+//         // return
+//     }
+// }
