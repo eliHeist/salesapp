@@ -21,6 +21,6 @@
 
 <div class="font-semibold flex gap-x-2">
     <span class="my-auto opacity-80 text-green-600">UGX</span> 
-    <span class="text-8xl font-bold">{firstDigits}</span>
+    <span class="text-8xl font-bold">{firstDigits.toLocaleString('en-US')}</span>
     <span class="text-xl font-semibold mt-auto">{lastDigits}</span>
 </div>
