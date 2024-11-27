@@ -7,6 +7,15 @@
 
     let open = false
     export let data;
+
+    let role = 'NORMAL'
+    if (data.user) {
+        try {
+            role = data.user.role
+        } catch (error) {
+            role = 'NORMAL'
+        }
+    }
 </script>
 
 <div class="min-h-screen bg-background">
@@ -22,7 +31,7 @@
 
 	<div class="flex">
 		<!-- Sidebar -->
-		<SideBar mode={data.user.role} bind:open />
+		<SideBar mode={role} bind:open />
 
 		<!-- Main content -->
 		<main class="flex-1 lg:ml-64">
