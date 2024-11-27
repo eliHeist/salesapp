@@ -20,21 +20,33 @@
 	import NumberField from '$lib/components/custom/numberField/number-field.svelte';
 
 	export let data: PageData;
+    console.log(data.productWithMostSales)
 
 	let showForm = false;
+
+    function handleSubmit() {
+        setInterval(() => {
+            showForm = false
+        }, 700)
+    }
+
+    let unitsSold = 0
+    data.productWithMostSales.sales.forEach(sale => {
+        unitsSold += sale.quantity
+    });
 </script>
 
 <div class="space-y-6">
 	<div class="flex items-center justify-between">
 		<h2 class="text-3xl font-bold tracking-tight">Products</h2>
-        <Dialog.Root>
+        <Dialog.Root bind:open={showForm}>
 			<Dialog.Trigger>
 				<div class="flex items-center">
 					<Plus class="mr-2 h-4 w-4" /> Add Product
 				</div>
 			</Dialog.Trigger>
 			<Dialog.Content class="w-full max-w-2xl">
-                <form method="POST" action="?/create" use:enhance class="space-y-4 bg-card p-4 rounded-lg">
+                <form method="POST" action="?/create" use:enhance on:submit={handleSubmit} class="space-y-4 bg-card p-4 rounded-lg">
                     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div class="space-y-2 lg:col-span-2">
                             <Label for="name">Name</Label>
@@ -62,18 +74,27 @@
 	</div>
 
     <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-16">
-        <div class="grid gap-2 bg-muted/30 hover:bg-muted/50 p-6 rounded-lg">
-            <h3 class=" font-semibold text-lg">Total Products</h3>
+        <div class="grid gap-2 bg-muted hover:bg-muted/50 p-6 rounded-lg">
+            <h3 class=" font-semibold text-lg text-muted-foreground">Total Products</h3>
             <p class="text-6xl font-bold">{data.products.length.toLocaleString("en-US")}</p>
         </div>
-        <div class="grid gap-2 bg-muted/30 hover:bg-muted/50 p-6 rounded-lg">
-            <h3 class=" font-semibold text-lg">Highest Seller</h3>
-            <div>
-                <p></p>
+        <div class="grid gap-2 bg-muted hover:bg-muted/50 p-6 rounded-lg">
+            <h3 class=" font-semibold text-lg text-muted-foreground">Highest Seller</h3>
+            {#if data.productWithMostSales}
+            <div class="flex gap-x-2">
+                <div>
+                    <p class="text-6xl font-bold">{data.productWithMostSales.sales.length.toLocaleString("en-US")}</p>
+                </div>
+                <div class="grid content-center">
+                    <p class="font-semibold">{data.productWithMostSales.name}</p>
+                    <p class="text-muted-foreground">{unitsSold.toLocaleString("en-US")} units sold</p>
+                </div>
             </div>
+            {/if}
         </div>
-        <div class="grid gap-2 bg-muted/30 hover:bg-muted/50 p-6 rounded-lg">
-            <h3 class=" font-semibold text-lg">Highest Stock</h3>
+        <div class="grid gap-2 bg-muted hover:bg-muted/50 p-6 rounded-lg">
+            <h3 class=" font-semibold text-lg text-muted-foreground">Highest Stock</h3>
+            {#if data.productWithMostStock}
             <div class="flex gap-x-2">
                 <div>
                     <p class="text-6xl font-bold">{data.productWithMostStock.stock.toLocaleString("en-US")}</p>
@@ -82,9 +103,10 @@
                     <p class="font-semibold">{data.productWithMostStock.name}</p>
                 </div>
             </div>
+            {/if}
         </div>
-        <div class="grid gap-2 bg-muted/30 hover:bg-muted/50 p-6 rounded-lg">
-            <h3 class=" font-semibold text-lg">Low Stock</h3>
+        <div class="grid gap-2 bg-muted hover:bg-muted/50 p-6 rounded-lg">
+            <h3 class=" font-semibold text-lg text-muted-foreground">Low Stock</h3>
             <div class="flex gap-x-2">
                 <div>
                     <p class="text-6xl font-bold">{data.productsOutOfStock.length.toLocaleString("en-US")}</p>

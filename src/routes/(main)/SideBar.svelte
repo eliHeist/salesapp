@@ -2,16 +2,19 @@
 	import { X } from 'lucide-svelte';
     import { Button } from '$lib/components/ui/button';
 	import SideBarNav from './SideBarNav.svelte';
+    import Logo from '$lib/components/logo.svelte';
 
     export let open = false
+    export let mode = null
 </script>
 
 <aside class="hidden lg:flex h-screen w-64 flex-col fixed left-0 border-r">
     <div class="p-6 flex items-center justify-center">
-        <h1 class="font-bold text-2xl">Minatrox</h1>
+        <h1 class="hidden">Minatrox</h1>
+        <Logo />
     </div>
     <nav class="flex-1 space-y-2 p-4">
-        <SideBarNav />
+        <SideBarNav {mode} />
     </nav>
 </aside>
 

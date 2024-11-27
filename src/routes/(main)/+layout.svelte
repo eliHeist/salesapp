@@ -6,9 +6,8 @@
     import { Button } from '$lib/components/ui/button';
 
     let open = false
+    export let data;
 </script>
-
-<ModeWatcher />
 
 <div class="min-h-screen bg-background">
 	<!-- Mobile header -->
@@ -23,7 +22,7 @@
 
 	<div class="flex">
 		<!-- Sidebar -->
-		<SideBar bind:open />
+		<SideBar mode={data.user.role} bind:open />
 
 		<!-- Main content -->
 		<main class="flex-1 lg:ml-64">

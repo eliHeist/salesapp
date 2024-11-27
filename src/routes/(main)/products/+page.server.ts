@@ -14,15 +14,22 @@ export const load: PageServerLoad = async ({ locals }) => {
         orderBy: { createdAt: 'desc' }
     });
 
-    // // Get the product with the most sales
-    // const productWithMostSales = await prisma.product.findFirst({
-    //     include: { sales: true },
-    //     orderBy: {
-    //         sales: {
-    //             _sum: { quantity: 'desc' }
-    //         }
-    //     }
-    // });
+    // Step 1: Get the product ID with the most sales 
+    const mostSales = await prisma.sale.groupBy({
+        by: ['productId'],
+        _sum: { quantity: true },
+        orderBy: { _sum: { quantity: 'desc' } },
+        take: 1
+    });
+    
+    if (mostSales.length === 0) return null;
+    const productId = mostSales[0].productId;
+    
+    // Step 2: Fetch the corresponding product 
+    const productWithMostSales = await prisma.product.findUnique({
+        where: { id: productId },
+        include: { sales: true }
+    });
 
     // Get the product with the most stock
     const productWithMostStock = await prisma.product.findFirst({
@@ -37,7 +44,7 @@ export const load: PageServerLoad = async ({ locals }) => {
             stock: 0
         }
     });
-    return { products, productWithMostStock, productsOutOfStock };
+    return { products, productWithMostStock, productsOutOfStock, productWithMostSales };
 };
 
 export const actions = {

@@ -1,11 +1,11 @@
 <script lang="ts">
     import '../../../app.scss';
     import { ModeWatcher } from 'mode-watcher';
+    import Logo from "$lib/components/logo.svelte";
 
 	let { form } = $props();
 </script>
 
-<ModeWatcher />
 
 <section class="bg-muted py-20 lg:py-[120px]">
 	<div class="container mx-auto">
@@ -13,8 +13,10 @@
 			<div class="w-full px-4">
 				<div class="relative mx-auto max-w-[525px] overflow-hidden rounded-lg bg-background px-10 py-16 text-center sm:px-12 md:px-[60px]">
 					<div class="mb-10 text-center md:mb-16">
-                        <h1 class="text-4xl font-bold text-primary">Minatrox</h1>
-                        <p>Beauty Palour</p>
+                        <h1 class="hidden">Minatrox</h1>
+                        <div class="">
+                            <Logo/>
+                        </div>
 					</div>
 					<form action="?/login" method="POST">
 						<div class="mb-6">

@@ -100,19 +100,28 @@
 		}
 		return total.toLocaleString('en-US');
 	}
+
+    let form; 
+    let saleDialogOpen;
+    function handleSubmit(response) { 
+        // add a 1s delay
+        setTimeout(() => {
+            saleDialogOpen = false
+        }, 500)
+    }
 </script>
 
 <div class="space-y-6">
 	<div class="flex items-center justify-between">
 		<h2 class="text-3xl font-bold tracking-tight">Sales</h2>
-		<Dialog.Root>
+		<Dialog.Root bind:open={saleDialogOpen}>
 			<Dialog.Trigger>
 				<div class="flex items-center" on:click={() => (batchSales = [])}>
 					<Plus class="mr-2 h-4 w-4" /> New Sale
 				</div>
 			</Dialog.Trigger>
 			<Dialog.Content class="w-full max-w-2xl">
-				<form method="POST" action="?/createBatch" use:enhance class="space-y-4">
+				<form method="POST" action="?/createBatch" use:enhance on:submit={handleSubmit} class="space-y-4">
 					<div class="grid gap-2 lg:grid-cols-2">
 						<div>
 							<Label for="batchDate">Date*</Label>
@@ -187,7 +196,7 @@
 					<TableHeader>
 						<TableRow>
 							<TableHead>Items</TableHead>
-							<TableHead>Description</TableHead>
+							<TableHead class="hidden lg:table-cell">Description</TableHead>
 							<TableHead class="text-right">Total</TableHead>
 							<TableHead></TableHead>
 						</TableRow>
@@ -196,7 +205,7 @@
 						{#each data.todaysSales.slice().reverse() as batch}
 							<TableRow>
 								<TableCell>{batch.sales.length}</TableCell>
-								<TableCell>{batch.description}</TableCell>
+								<TableCell class="hidden lg:table-cell">{batch.description}</TableCell>
 								<TableCell class="text-right">{getBatchTotal(batch)}</TableCell>
 								<TableCell>
 									<div class="flex justify-end">
@@ -262,7 +271,7 @@
 					<TableHeader>
 						<TableRow>
 							<TableHead>Date</TableHead>
-							<TableHead>Description</TableHead>
+							<TableHead class="hidden lg:table-cell">Description</TableHead>
 							<TableHead class="text-right">Total</TableHead>
 							<TableHead></TableHead>
 						</TableRow>
@@ -271,7 +280,7 @@
 						{#each data.earlierSales.slice().reverse() as batch}
 							<TableRow>
 								<TableCell>{batch.date.toLocaleString('en-US', { dateStyle: 'long' })}</TableCell>
-								<TableCell>{batch.description}</TableCell>
+								<TableCell class="hidden lg:table-cell">{batch.description}</TableCell>
 								<TableCell class="text-right">{getBatchTotal(batch)}</TableCell>
 								<TableCell>
 									<div class="flex justify-end">

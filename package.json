@@ -11,7 +11,7 @@
 		"format": "prettier --write .",
 		"lint": "prettier --check .",
 		"postinstall": "prisma generate",
-		"createsuperuser": "node scripts/createsuperuser.js"
+		"initialize": "node scripts/starters.js"
 	},
 	"devDependencies": {
 		"@internationalized/date": "^3.5.6",

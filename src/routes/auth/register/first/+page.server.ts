@@ -12,7 +12,8 @@ enum Roles {
 
 export const load = async ({ locals }) => {
     // redirect user if logged in
-    if (!locals.user && locals.user.role != 'ADMIN') {
+    const users = await db.user.count()
+    if (users > 0) {
         redirect(302, '/auth/login')
     }
 }
@@ -46,9 +47,10 @@ const register = async ({ request }) => {
             username,
             full_name,
             email,
+            superuser: true,
             passwordHash: await bcrypt.hash(password, 10),
             userAuthToken: crypto.randomUUID(),
-            role: { connect: { name: Roles.USER } },
+            role: { connect: { name: Roles.ADMIN } },
         },
     })
 

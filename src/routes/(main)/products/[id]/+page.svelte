@@ -5,7 +5,6 @@
     import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
     import { Button } from '$lib/components/ui/button';
-    import * as Table from '$lib/components/ui/table'
     import * as Dialog from '$lib/components/ui/dialog';
 
     import NumberField from '$lib/components/custom/numberField/number-field.svelte';
@@ -13,6 +12,7 @@
     import { PackagePlus, Blocks, Trash2, Edit } from "lucide-svelte";
 
     export let data: PageData
+    console.log(data.user)
 
     let pdt = data.product
 
@@ -24,7 +24,7 @@
             <h3 class=" font-semibold text-lg">Product</h3>
             <p>{data.product.name}</p>
             {#if data.product.description}
-            <p>{data.product.description}</p>
+            <p class="text-sm text-muted-foreground">{data.product.description}</p>
             {/if}
         </div>
         <div class="grid gap-2 bg-muted/30 hover:bg-muted/50 p-6 rounded-lg">
@@ -46,7 +46,7 @@
         <Blocks class="h-6 w-6" />
         Actions</h2>
     <div class="actions py-6 grid sm:flex gap-8">
-        <div class="hidden">
+        {#if data.user.role == 'ADMIN'}
             <Dialog.Root>
                 <Dialog.Trigger>
                     <Button variant="outline" size="lg">
@@ -66,7 +66,7 @@
                     </form>
                 </Dialog.Content>
             </Dialog.Root>
-        </div>
+        {/if}
         <Dialog.Root>
             <Dialog.Trigger>
                 <Button variant="outline" size="lg">
