@@ -27,6 +27,7 @@
 	</nav>
 	<div class="p-4">
 		<div class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500">
+            {#if user}
 			<div class="rounded-full h-6 w-6">
                 <UserCheck class="text-green-500" />
             </div>
@@ -34,6 +35,7 @@
                 <span class="text-sm">{user.full_name}</span>
                 <span class="text-xs">@{user.username}</span>
             </div>
+            {/if}
 		</div>
 	</div>
 </aside>
