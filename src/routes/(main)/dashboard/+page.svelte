@@ -11,7 +11,7 @@
     export let data:PageData;
 </script>
 
-<div class="space-y-8">
+<div class="grid gap-y-8">
 	<div class="flex flex-col gap-4">
 		<h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
 		<div class="text-muted-foreground">
@@ -19,7 +19,7 @@
 		</div>
 	</div>
 
-	<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+	<div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
 		<Card class="grid [grid-template-rows:_auto_1fr]">
 			<CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
 				<CardTitle class="text-sm font-medium">Total Revenue</CardTitle>
@@ -53,8 +53,8 @@
 		</Card>
 	</div>
 
-	<div class="grid gap-4">
-		<Card class="grid [grid-template-rows:_auto_1fr_auto]">
+	<div class="grid gap-4 max-w-full">
+		<Card class="grid [grid-template-rows:_auto_1fr_auto] max-w-full">
 			<CardHeader>
 				<CardTitle>Sales Overview</CardTitle>
 			</CardHeader>
@@ -62,7 +62,7 @@
                 <SalesBarChart salesData={data.saleBatches}/>
 			</CardContent>
 		</Card>
-		<Card class="grid [grid-template-rows:_auto_1fr_auto]">
+		<Card class="grid [grid-template-rows:_auto_1fr_auto] max-w-full">
 			<CardHeader>
 				<CardTitle>Revenue Overview</CardTitle>
 			</CardHeader>

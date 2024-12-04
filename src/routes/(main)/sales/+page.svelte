@@ -176,7 +176,7 @@
 									Product availability.
 								{/if}
 							</p>
-							<NumberField name="" min={1} bind:max={maxQuantity} bind:value={quantity} />
+							<NumberField name="" min={0} bind:max={maxQuantity} bind:value={quantity} />
 							<Button variant="secondary" type="button" on:click={addSale}>Add Item</Button>
 						</div>
 
