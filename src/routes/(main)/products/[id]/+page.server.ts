@@ -12,6 +12,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
     if (!locals.user) {
         redirect(302, '/auth/login')
     }
+    
     let user = locals.user
 
     const { id } = params;

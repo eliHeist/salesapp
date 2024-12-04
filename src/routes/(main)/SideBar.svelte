@@ -1,33 +1,57 @@
 <script lang="ts">
-	import { X } from 'lucide-svelte';
-    import { Button } from '$lib/components/ui/button';
+	import { X, UserCheck } from 'lucide-svelte';
+	import { Button } from '$lib/components/ui/button';
 	import SideBarNav from './SideBarNav.svelte';
-    import Logo from '$lib/components/logo.svelte';
+	import Logo from '$lib/components/logo.svelte';
 
-    export let open = false
-    export let mode = null
+	export let open = false;
+	export let user;
+	export let mode = user.role;
+    console.log(user)
 </script>
 
-<aside class="hidden lg:flex h-screen w-64 flex-col fixed left-0 border-r">
-    <div class="p-6 flex items-center justify-center">
-        <h1 class="hidden">Minatrox</h1>
-        <Logo />
-    </div>
-    <nav class="flex-1 space-y-2 p-4">
-        <SideBarNav {mode} />
-    </nav>
+<aside class="fixed left-0 hidden h-screen w-64 flex-col border-r lg:flex">
+	<div class="flex items-center justify-center p-6">
+		<h1 class="hidden">Minatrox</h1>
+		<Logo />
+	</div>
+	<nav class="flex-1 space-y-2 p-4">
+		<SideBarNav {mode} />
+	</nav>
+	<div class="p-4">
+		<div class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500">
+			<div class="rounded-full h-6 w-6">
+                <UserCheck class="text-green-500" />
+            </div>
+            <div class="grid">
+                <span class="text-sm">{user.full_name}</span>
+                <span class="text-xs">@{user.username}</span>
+            </div>
+		</div>
+	</div>
 </aside>
 
-
-<aside class="lg:hidden h-screen fixed grid items-start content-start left-0 top-0 border-r bg-background min-w-80 z-10 transition-transform {open ? 'translate-x-0' : '-translate-x-full'}">
-    <div class="p-6 flex items-center justify-between w-full">
-        <!-- close button for mobile -->
-        <Button class="lg:hidden { open ? 'scale-100' : 'scale-0' } transition-all delay-300" variant="ghost" type="button" size="icon" on:click={() => {open = false}}>
-            <X class="h-5 w-5" />
-        </Button>
-        <h1 class="font-bold text-2xl">Minatrox</h1>
-    </div>
-    <nav class="flex-1 space-y-2 p-4">
-        <SideBarNav />
-    </nav>
+<aside
+	class="fixed left-0 top-0 z-10 grid h-screen min-w-80 content-start items-start border-r bg-background transition-transform lg:hidden {open
+		? 'translate-x-0'
+		: '-translate-x-full'}"
+>
+	<div class="flex w-full items-center justify-between p-6">
+		<!-- close button for mobile -->
+		<Button
+			class="lg:hidden {open ? 'scale-100' : 'scale-0'} transition-all delay-300"
+			variant="ghost"
+			type="button"
+			size="icon"
+			on:click={() => {
+				open = false;
+			}}
+		>
+			<X class="h-5 w-5" />
+		</Button>
+		<h1 class="text-2xl font-bold">Minatrox</h1>
+	</div>
+	<nav class="flex-1 space-y-2 p-4">
+		<SideBarNav />
+	</nav>
 </aside>

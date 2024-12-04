@@ -15,7 +15,7 @@
 
 <div class="space-y-6">
     <div class="flex items-center justify-between ">
-        <h2 class="text-3xl font-bold tracking-tight">Products</h2>
+        <h2 class="text-3xl font-bold tracking-tight">Users</h2>
         <a href="/auth/register/">
             <Button variant="secondary">
                 <UserPlus class="mr-2 h-5 w-5" />

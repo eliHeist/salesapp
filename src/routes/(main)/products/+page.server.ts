@@ -10,6 +10,9 @@ export const load: PageServerLoad = async ({ locals }) => {
     if (!locals.user) {
         redirect(302, '/auth/login')
     }
+
+    const user = locals.user
+
     const products = await prisma.product.findMany({
         orderBy: { createdAt: 'desc' }
     });
@@ -44,7 +47,7 @@ export const load: PageServerLoad = async ({ locals }) => {
             stock: 0
         }
     });
-    return { products, productWithMostStock, productsOutOfStock, productWithMostSales };
+    return { products, productWithMostStock, productsOutOfStock, productWithMostSales, user };
 };
 
 export const actions = {

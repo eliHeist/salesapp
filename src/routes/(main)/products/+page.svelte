@@ -34,11 +34,21 @@
     data.productWithMostSales.sales.forEach(sale => {
         unitsSold += sale.quantity
     });
+
+    let role = 'NORMAL'
+    if (data.user) {
+        try {
+            role = data.user.role
+        } catch (error) {
+            role = 'NORMAL'
+        }
+    }
 </script>
 
 <div class="space-y-6">
 	<div class="flex items-center justify-between">
 		<h2 class="text-3xl font-bold tracking-tight">Products</h2>
+        {#if role == 'ADMIN'}
         <Dialog.Root bind:open={showForm}>
 			<Dialog.Trigger>
 				<div class="flex items-center">
@@ -71,6 +81,7 @@
                 </form>
 			</Dialog.Content>
 		</Dialog.Root>
+        {/if}
 	</div>
 
     <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-16">

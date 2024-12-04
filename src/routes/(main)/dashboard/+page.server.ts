@@ -8,6 +8,9 @@ export const load = async ({ locals }) => {
     if (!locals.user) {
         redirect(302, '/auth/login')
     }
+    if (locals.user.role != 'ADMIN') {
+        redirect(302, '/sales')
+    }
 
     const [
         totalRevenue, numberOfSales, topSellingProducts, topRevenueProducts,

@@ -27,6 +27,7 @@
 	<Package2 class="h-5 w-5" />
 	Products
 </a>
+{#if mode == 'ADMIN'}
 <a
 	href="/dashboard"
 	class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50 {$page
@@ -38,7 +39,6 @@
 	Dashboard
 </a>
 
-{#if mode == 'ADMIN'}
 <a
 	href="/users"
 	class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50 {$page

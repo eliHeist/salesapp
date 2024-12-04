@@ -31,7 +31,7 @@
 
 	<div class="flex">
 		<!-- Sidebar -->
-		<SideBar mode={role} bind:open />
+		<SideBar user={data.user} bind:open />
 
 		<!-- Main content -->
 		<main class="flex-1 lg:ml-64">

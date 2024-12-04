@@ -19,7 +19,14 @@
 	import SelectCombo from './SelectCombo.svelte';
 	import DatePicker from './DatePicker.svelte';
 
-	import { Plus, Trash2, CircleArrowOutUpRight, CircuitBoard, Download } from 'lucide-svelte';
+	import {
+		Plus,
+		Trash2,
+		CircleArrowOutUpRight,
+		CircuitBoard,
+		Download,
+		FileQuestion
+	} from 'lucide-svelte';
 
 	import type { Product, SaleBatch } from '@prisma/client';
 	import { type CalendarDate, today, getLocalTimeZone } from '@internationalized/date';
@@ -55,17 +62,17 @@
 		let _continue = true;
 
 		if (!selectedProduct || quantity <= 0) {
-            return
+			return;
 		}
 		if (selectedProduct.stock == quantity) {
-            _continue = confirm(`This sale will deplete all stocked ${selectedProduct.name} units.`);
+			_continue = confirm(`This sale will deplete all stocked ${selectedProduct.name} units.`);
 		} else if (selectedProduct.stock < quantity) {
-            alert(`Quantity selected is greater than the available units of ${selectedProduct.name}.`);
-            _continue = false
+			alert(`Quantity selected is greater than the available units of ${selectedProduct.name}.`);
+			_continue = false;
 		}
-        if (!_continue) {
-            return
-        }
+		if (!_continue) {
+			return;
+		}
 
 		const existingSale = batchSales.find((sale) => sale.productId === selectedProduct?.id);
 
@@ -75,15 +82,15 @@
 			existingSale.total = selectedProduct.price * existingSale.quantity; // Recalculate total
 			batchSales = [...batchSales];
 		} else {
-            // Otherwise, add a new sale to the batch
+			// Otherwise, add a new sale to the batch
 			const newSale = {
-                productId: selectedProduct.id,
+				productId: selectedProduct.id,
 				quantity,
 				total: selectedProduct.price * quantity
 			};
 			batchSales = [...batchSales, newSale];
 		}
-        
+
 		// Reset fields
 		selectedProduct = null;
 		quantity = 0;
@@ -127,9 +134,9 @@
 		<h2 class="text-3xl font-bold tracking-tight">Sales</h2>
 		<Dialog.Root bind:open={saleDialogOpen}>
 			<Dialog.Trigger>
-				<div class="flex items-center" on:click={() => (batchSales = [])}>
+				<button class="flex items-center" on:click={() => (batchSales = [])}>
 					<Plus class="mr-2 h-4 w-4" /> New Sale
-				</div>
+				</button>
 			</Dialog.Trigger>
 			<Dialog.Content class="w-full max-w-2xl">
 				<form
@@ -219,9 +226,9 @@
 		</Dialog.Root>
 	</div>
 
-	<div class="grid gap-4 md:grid-cols-2">
+	<div class="grid grid-flow-col gap-4">
 		<div class="grid content-start rounded-md border">
-			<h2 class="my-4 text-center text-xl font-medium text-muted-foreground">Today</h2>
+			<h2 class="mb-6 mt-4 text-center text-xl font-medium text-muted-foreground">Today</h2>
 			{#if data.todaysSales.length > 0}
 				<Table>
 					<TableHeader>
@@ -288,13 +295,13 @@
 				</Table>
 			{:else}
 				<p class="m-auto p-4 text-center">
-					<CircuitBoard class="mx-auto mb-8 h-20 w-20 rotate-45 opacity-20" />
+					<FileQuestion class="mx-auto mb-8 h-20 w-20 opacity-20" />
 					No sales today
 				</p>
 			{/if}
 		</div>
-		<div class="grid content-start rounded-md border">
-			{#if data.earlierSales.length > 0}
+		{#if data.earlierSales.length > 0}
+			<div class="grid content-start rounded-md border">
 				<h2 class="my-4 text-center text-xl font-medium text-muted-foreground">
 					Earlier this week
 				</h2>
@@ -361,12 +368,12 @@
 						{/each}
 					</TableBody>
 				</Table>
-			{:else}
+				<!-- {:else}
 				<p class="m-auto p-4 text-center">
-					<CircuitBoard class="mx-auto mb-8 h-20 w-20 rotate-45 opacity-20" />
+					<FileQuestion class="mx-auto mb-8 h-20 w-20 rotate-45 opacity-20" />
 					No sales earlier this week
-				</p>
-			{/if}
-		</div>
+				</p> -->
+			</div>
+		{/if}
 	</div>
 </div>
