@@ -6,7 +6,14 @@
 
 	export let open = false;
 	export let user;
-	export let mode = user.role;
+	export let mode = 'NORMAL';
+    if (user) {
+        try {
+            mode = user.role
+        } catch (error) {
+            mode = 'NORMAL'
+        }
+    }
     console.log(user)
 </script>
 
