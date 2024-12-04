@@ -20,7 +20,9 @@
 	import NumberField from '$lib/components/custom/numberField/number-field.svelte';
 
 	export let data: PageData;
+    console.log("Hey there")
     console.log(data.productWithMostSales)
+    console.log(data.productsOutOfStock)
 
 	let showForm = false;
 
@@ -31,9 +33,11 @@
     }
 
     let unitsSold = 0
-    data.productWithMostSales.sales.forEach(sale => {
-        unitsSold += sale.quantity
-    });
+    if (data.productWithMostSales) {
+        data.productWithMostSales.sales.forEach(sale => {
+            unitsSold += sale.quantity
+        });
+    }
 
     let role = 'NORMAL'
     if (data.user) {
@@ -87,7 +91,9 @@
     <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-16">
         <div class="grid gap-2 bg-muted hover:bg-muted/50 p-6 rounded-lg">
             <h3 class=" font-semibold text-lg text-muted-foreground">Total Products</h3>
+            {#if data.products}
             <p class="text-6xl font-bold">{data.products.length.toLocaleString("en-US")}</p>
+            {/if}
         </div>
         <div class="grid gap-2 bg-muted hover:bg-muted/50 p-6 rounded-lg">
             <h3 class=" font-semibold text-lg text-muted-foreground">Highest Seller</h3>
@@ -120,7 +126,9 @@
             <h3 class=" font-semibold text-lg text-muted-foreground">Low Stock</h3>
             <div class="flex gap-x-2">
                 <div>
+                    {#if data.productsOutOfStock}
                     <p class="text-6xl font-bold">{data.productsOutOfStock.length.toLocaleString("en-US")}</p>
+                    {/if}
                 </div>
                 <div class="grid content-end">
                     <p class="font-semibold"></p>

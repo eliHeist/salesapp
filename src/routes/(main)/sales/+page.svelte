@@ -134,9 +134,9 @@
 		<h2 class="text-3xl font-bold tracking-tight">Sales</h2>
 		<Dialog.Root bind:open={saleDialogOpen}>
 			<Dialog.Trigger>
-				<button class="flex items-center" on:click={() => (batchSales = [])}>
+				<div tabindex="2" role="button" class="flex items-center" on:click={() => (batchSales = [])}>
 					<Plus class="mr-2 h-4 w-4" /> New Sale
-				</button>
+				</div>
 			</Dialog.Trigger>
 			<Dialog.Content class="w-full max-w-2xl">
 				<form
