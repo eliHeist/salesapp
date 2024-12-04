@@ -52,41 +52,52 @@
 	}
 
 	const addSale = () => {
-		if (selectedProduct && quantity > 0) {
-			const existingSale = batchSales.find((sale) => sale.productId === selectedProduct?.id);
+		let _continue = true;
 
-			if (existingSale) {
-				// If the product already exists in the sales list, update its quantity
-				existingSale.quantity += quantity;
-				existingSale.total = selectedProduct.price * existingSale.quantity; // Recalculate total
-				batchSales = [...batchSales];
-			} else {
-				// Otherwise, add a new sale to the batch
-				const newSale = {
-					productId: selectedProduct.id,
-					quantity,
-					total: selectedProduct.price * quantity
-				};
-				batchSales = [...batchSales, newSale];
-			}
-
-			// Reset fields
-			selectedProduct = null;
-			quantity = 0;
-			batchSalesLength = batchSales.length;
-
-			console.log(batchSales);
+		if (!selectedProduct || quantity <= 0) {
+            return
 		}
+		if (selectedProduct.stock == quantity) {
+            _continue = confirm(`This sale will deplete all stocked ${selectedProduct.name} units.`);
+		} else if (selectedProduct.stock < quantity) {
+            alert(`Quantity selected is greater than the available units of ${selectedProduct.name}.`);
+            _continue = false
+		}
+        if (!_continue) {
+            return
+        }
+
+		const existingSale = batchSales.find((sale) => sale.productId === selectedProduct?.id);
+
+		if (existingSale) {
+			// If the product already exists in the sales list, update its quantity
+			existingSale.quantity += quantity;
+			existingSale.total = selectedProduct.price * existingSale.quantity; // Recalculate total
+			batchSales = [...batchSales];
+		} else {
+            // Otherwise, add a new sale to the batch
+			const newSale = {
+                productId: selectedProduct.id,
+				quantity,
+				total: selectedProduct.price * quantity
+			};
+			batchSales = [...batchSales, newSale];
+		}
+        
+		// Reset fields
+		selectedProduct = null;
+		quantity = 0;
+		batchSalesLength = batchSales.length;
 	};
 
-    const removeSale = (id: number) => {
-        const existingSale = batchSales.find((sale) => sale.productId === id);
+	const removeSale = (id: number) => {
+		const existingSale = batchSales.find((sale) => sale.productId === id);
 
-        if (existingSale) {
-            batchSales = batchSales.filter((sale) => sale.productId !== id);
-            batchSalesLength = batchSales.length;
-        }
-    }
+		if (existingSale) {
+			batchSales = batchSales.filter((sale) => sale.productId !== id);
+			batchSalesLength = batchSales.length;
+		}
+	};
 
 	function findProductById(productId: number): Product | undefined {
 		let prod = data.products.find((p) => p.id === productId);
@@ -101,14 +112,14 @@
 		return total.toLocaleString('en-US');
 	}
 
-    let form; 
-    let saleDialogOpen;
-    function handleSubmit(response) { 
-        // add a 1s delay
-        setTimeout(() => {
-            saleDialogOpen = false
-        }, 500)
-    }
+	let form;
+	let saleDialogOpen;
+	function handleSubmit(response) {
+		// add a 1s delay
+		setTimeout(() => {
+			saleDialogOpen = false;
+		}, 500);
+	}
 </script>
 
 <div class="space-y-6">
@@ -121,7 +132,13 @@
 				</div>
 			</Dialog.Trigger>
 			<Dialog.Content class="w-full max-w-2xl">
-				<form method="POST" action="?/createBatch" use:enhance on:submit={handleSubmit} class="space-y-4">
+				<form
+					method="POST"
+					action="?/createBatch"
+					use:enhance
+					on:submit={handleSubmit}
+					class="space-y-4"
+				>
 					<div class="grid gap-2 lg:grid-cols-2">
 						<div>
 							<Label for="batchDate">Date*</Label>
@@ -141,8 +158,17 @@
 
 					<div class="space-y-4">
 						<h3 class="text-xl">Add items to Sale</h3>
-						<div class="flex gap-4">
-							<SelectCombo products={data.products} bind:selectedProduct />
+						<div class="grid items-center gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+							<div class="grid lg:col-span-2">
+								<SelectCombo products={data.products} bind:selectedProduct />
+							</div>
+							<p class="-mt-2 text-sm lg:order-1 lg:col-span-2">
+								{#if selectedProduct}
+									{selectedProduct.stock} units.
+								{:else}
+									Product availability.
+								{/if}
+							</p>
 							<NumberField name="" min={1} bind:max={maxQuantity} bind:value={quantity} />
 							<Button variant="secondary" type="button" on:click={addSale}>Add Item</Button>
 						</div>
@@ -160,7 +186,12 @@
 												>
 												<TableCell>
 													<div class="flex justify-end">
-														<Button variant="outline" size="iconSm" type="button" on:click={() => removeSale(sale.productId)}>
+														<Button
+															variant="outline"
+															size="iconSm"
+															type="button"
+															on:click={() => removeSale(sale.productId)}
+														>
 															<Trash2 class="h-4 w-4" />
 														</Button>
 													</div>
@@ -177,11 +208,11 @@
 
 					<input type="text" class="hidden" name="sales" value={JSON.stringify(batchSales)} />
 					<Dialog.Footer class="mt-8">
-                        {#if batchSalesLength > 0}
-						    <Button type="submit">Create Sale</Button>
-                        {:else}
-						    <Button variant="ghost" type="button" disabled>Create Sale</Button>
-                        {/if}
+						{#if batchSalesLength > 0}
+							<Button type="submit">Create Sale</Button>
+						{:else}
+							<Button variant="ghost" type="button" disabled>Create Sale</Button>
+						{/if}
 					</Dialog.Footer>
 				</form>
 			</Dialog.Content>
@@ -222,31 +253,31 @@
 											</Dialog.Trigger>
 											<Dialog.Content class="w-full max-w-2xl">
 												<div class="flex gap-x-1">
-                                                    <span class="font-semibold">Date:</span>
-                                                    <p>{batch.date.toLocaleString('en-US', { dateStyle: 'long' })}</p>
-                                                </div>
-                                                <div class="flex gap-x-1">
-                                                    <span class="font-semibold">Description:</span>
-                                                    <p>{batch.description}</p>
-                                                </div>
-                                                <div class="flex gap-x-1">
-                                                    <span class="font-semibold">Total:</span>
-                                                    <p>{getBatchTotal(batch)}</p>
-                                                </div>
-                                                <div class="grid gap-2">
-                                                    <span class="font-semibold">Items</span>
-                                                    <ul>
-                                                        {#each batch.sales as sale}
-                                                            <li class="flex justify-between">
-                                                                <p>
-                                                                    {sale.quantity}
-                                                                    {findProductById(sale.productId)?.name}
-                                                                </p>
-                                                                <p>{sale.total.toLocaleString('en-US')}</p>
-                                                            </li>
-                                                        {/each}
-                                                    </ul>
-                                                </div>
+													<span class="font-semibold">Date:</span>
+													<p>{batch.date.toLocaleString('en-US', { dateStyle: 'long' })}</p>
+												</div>
+												<div class="flex gap-x-1">
+													<span class="font-semibold">Description:</span>
+													<p>{batch.description}</p>
+												</div>
+												<div class="flex gap-x-1">
+													<span class="font-semibold">Total:</span>
+													<p>{getBatchTotal(batch)}</p>
+												</div>
+												<div class="grid gap-2">
+													<span class="font-semibold">Items</span>
+													<ul>
+														{#each batch.sales as sale}
+															<li class="flex justify-between">
+																<p>
+																	{sale.quantity}
+																	{findProductById(sale.productId)?.name}
+																</p>
+																<p>{sale.total.toLocaleString('en-US')}</p>
+															</li>
+														{/each}
+													</ul>
+												</div>
 											</Dialog.Content>
 										</Dialog.Root>
 									</div>
@@ -297,31 +328,31 @@
 											</Dialog.Trigger>
 											<Dialog.Content class="w-full max-w-2xl">
 												<div class="flex gap-x-1">
-                                                    <span class="font-semibold">Date:</span>
-                                                    <p>{batch.date.toLocaleString('en-US', { dateStyle: 'long' })}</p>
-                                                </div>
-                                                <div class="flex gap-x-1">
-                                                    <span class="font-semibold">Description:</span>
-                                                    <p>{batch.description}</p>
-                                                </div>
-                                                <div class="flex gap-x-1">
-                                                    <span class="font-semibold">Total:</span>
-                                                    <p>{getBatchTotal(batch)}</p>
-                                                </div>
-                                                <div class="grid gap-2">
-                                                    <span class="font-semibold">Items</span>
-                                                    <ul>
-                                                        {#each batch.sales as sale}
-                                                            <li class="flex justify-between">
-                                                                <p>
-                                                                    {sale.quantity}
-                                                                    {findProductById(sale.productId)?.name}
-                                                                </p>
-                                                                <p>{sale.total.toLocaleString('en-US')}</p>
-                                                            </li>
-                                                        {/each}
-                                                    </ul>
-                                                </div>
+													<span class="font-semibold">Date:</span>
+													<p>{batch.date.toLocaleString('en-US', { dateStyle: 'long' })}</p>
+												</div>
+												<div class="flex gap-x-1">
+													<span class="font-semibold">Description:</span>
+													<p>{batch.description}</p>
+												</div>
+												<div class="flex gap-x-1">
+													<span class="font-semibold">Total:</span>
+													<p>{getBatchTotal(batch)}</p>
+												</div>
+												<div class="grid gap-2">
+													<span class="font-semibold">Items</span>
+													<ul>
+														{#each batch.sales as sale}
+															<li class="flex justify-between">
+																<p>
+																	{sale.quantity}
+																	{findProductById(sale.productId)?.name}
+																</p>
+																<p>{sale.total.toLocaleString('en-US')}</p>
+															</li>
+														{/each}
+													</ul>
+												</div>
 											</Dialog.Content>
 										</Dialog.Root>
 									</div>

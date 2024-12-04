@@ -19,7 +19,8 @@
 	<input
 		class="w-full grow bg-background px-3 py-2 text-center tabular-nums text-foreground focus:outline-none"
         bind:value
-        type="text"
+        inputmode="numeric"
+        type="number"
         name={name}
         min={min}
         max={max}
@@ -33,3 +34,15 @@
 		<Plus size={16} strokeWidth={2} aria-hidden="true" />
 	</button>
 </div>
+
+<style lang="scss">
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button{
+        appearance: none;
+        margin: 0;
+    }
+
+    input[type=number]{
+        appearance: textfield;
+    }
+</style>
