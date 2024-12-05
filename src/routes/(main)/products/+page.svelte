@@ -2,14 +2,7 @@
 	import { enhance } from '$app/forms';
 
 	import { Button } from '$lib/components/ui/button';
-	import {
-		Table,
-		TableBody,
-		TableCell,
-		TableHead,
-		TableHeader,
-		TableRow
-	} from '$lib/components/ui/table';
+	import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '$lib/components/ui/table';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
     import * as Dialog from '$lib/components/ui/dialog';
@@ -19,17 +12,69 @@
 	import type { PageData } from './$types';
 	import NumberField from '$lib/components/custom/numberField/number-field.svelte';
 
+    
+    interface FormData { 
+        name: string; 
+        price: number; 
+        stock: number; 
+        description?: string; 
+    }
+
 	export let data: PageData;
-    console.log("Hey there")
-    console.log(data.productWithMostSales)
-    console.log(data.productsOutOfStock)
+
+    let products = data.products
+
+    // console.log(data, products)
+
 
 	let showForm = false;
+    let errorMessage = '';
 
-    function handleSubmit() {
-        setInterval(() => {
-            showForm = false
-        }, 700)
+    async function handleSubmit(event: Event) {
+        event.preventDefault()
+        const formElement = event.target as HTMLFormElement; 
+        const formData = new FormData(formElement); // Get the form data 
+
+        // Convert formData to a JSON object 
+        let data: FormData = { 
+            name: formData.get('name')?.toString() || '', 
+            price: parseFloat(formData.get('price')?.toString() || '0'), 
+            stock: parseInt(formData.get('stock')?.toString() || '0'), 
+            description: formData.get('description')?.toString() || '' 
+        }; 
+
+        console.log(data)
+
+        // Validate data before sending it to the server 
+        if (!data.name) { 
+            errorMessage = 'Name is required'; 
+            return; 
+        } 
+        if (data.price === undefined || isNaN(data.price)) { 
+            errorMessage = 'Price is required and must be a number';
+            return; 
+        }
+        
+        try { 
+            const response = await fetch('/api/products/', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(data) 
+            }); 
+            
+            const result = await response.json(); 
+            
+            if (response.ok) { 
+                showForm = false;
+                products = [result.product, ...products]
+            } else { 
+                errorMessage = result.error; 
+                console.error(errorMessage); 
+            } 
+        } catch (error) { 
+            console.error('Error:', error); 
+            errorMessage = 'An unexpected error occurred'; 
+        }
     }
 
     let unitsSold = 0
@@ -60,7 +105,7 @@
 				</div>
 			</Dialog.Trigger>
 			<Dialog.Content class="w-full max-w-2xl">
-                <form method="POST" action="?/create" use:enhance on:submit={handleSubmit} class="space-y-4 bg-card p-4 rounded-lg">
+                <form use:enhance on:submit={handleSubmit} class="space-y-4 bg-card p-4 rounded-lg">
                     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div class="space-y-2 lg:col-span-2">
                             <Label for="name">Name</Label>
@@ -148,7 +193,7 @@
 				</TableRow>
 			</TableHeader>
 			<TableBody>
-				{#each data.products as product}
+				{#each products as product}
 					<TableRow>
 						<TableCell>{product.name}</TableCell>
 						<TableCell class="text-right">{product.price.toLocaleString('en-US')}</TableCell>

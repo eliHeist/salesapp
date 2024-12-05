@@ -14,7 +14,6 @@
             mode = 'NORMAL'
         }
     }
-    console.log(user)
 </script>
 
 <aside class="fixed left-0 hidden h-screen w-64 flex-col border-r lg:flex">

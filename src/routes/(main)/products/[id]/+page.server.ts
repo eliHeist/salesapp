@@ -96,11 +96,16 @@ export const actions = {
         const data = await request.formData();
         const id = parseInt(data.get('id')?.toString() || '0');
 
+        console.log("Deleting pdt ", id)
+
         try {
             await prisma.product.delete({
                 where: { id }
             });
+            console.log("deleted")
+            throw redirect(302, '/products')
         } catch (error) {
+            console.log(error)
             return fail(500, { error: 'Failed to delete product' });
         }
     }

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { enhance } from '$app/forms';
+    import { goto } from '$app/navigation';
 
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
@@ -12,9 +13,45 @@
 	import { PackagePlus, Blocks, Trash2, Edit } from 'lucide-svelte';
 
 	export let data: PageData;
-	console.log(data.user);
+	console.log(data.product);
 
 	let pdt = data.product;
+
+    let errorMessage = '';
+
+    async function handleDelete(event: Event) {
+        event.preventDefault(); // Prevent the default form submission
+        const formElement = event.target as HTMLFormElement;
+        const formData = new FormData(formElement); // Get the form data
+
+        // Convert formData to a JSON object
+        const data = {
+            id: formData.get('id')?.toString() || ''
+        };
+
+        try {
+            const response = await fetch('/api/products', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                console.log(result.success);
+                await goto('/products'); // Use goto for client-side navigation
+            } else {
+                errorMessage = result.error;
+                console.error(errorMessage);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            errorMessage = 'An unexpected error occurred';
+        }
+    }
 </script>
 
 <section class="py-4">
@@ -54,9 +91,9 @@
 				</Dialog.Trigger>
 				<Dialog.Content>
 					<p class="text-lg font-semibold">
-						Are you sure you want to delete, this will alter all the sales of this product.
+						Are you sure you want to delete {pdt.name}, <br>this will alter all the sales of this product.
 					</p>
-					<form method="POST" action="?/delete" use:enhance>
+					<form on:submit={handleDelete}>
 						<input type="hidden" name="id" value={data.product.id} />
 						<Button variant="destructive" size="lg" type="submit">
 							<Trash2 class="mr-2 h-4 w-4" />
