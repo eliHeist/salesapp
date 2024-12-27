@@ -15,7 +15,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import NumberField from '$lib/components/custom/numberField/number-field.svelte';
-    import { generatePDF } from "$lib/generatePDF";
+    // import { generatePDF } from "$lib/generatePDF";
 
 	import SelectCombo from './SelectCombo.svelte';
 	import DatePicker from './DatePicker.svelte';
@@ -130,7 +130,7 @@
 	}
 
     async function getPDF() {
-        await generatePDF()
+        // await generatePDF()
     }
 </script>
 

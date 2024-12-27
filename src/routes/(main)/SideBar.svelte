@@ -44,7 +44,7 @@
 		? 'translate-x-0'
 		: '-translate-x-full'}"
 >
-	<div class="flex w-full items-center justify-between p-6">
+	<div class="flex w-full items-start justify-between p-6">
 		<!-- close button for mobile -->
 		<Button
 			class="lg:hidden {open ? 'scale-100' : 'scale-0'} transition-all delay-300"
@@ -57,9 +57,11 @@
 		>
 			<X class="h-5 w-5" />
 		</Button>
-		<h1 class="text-2xl font-bold">Minatrox</h1>
+        <div class="w-48">
+            <Logo />
+        </div>
 	</div>
 	<nav class="flex-1 space-y-2 p-4">
-		<SideBarNav />
+		<SideBarNav {mode} />
 	</nav>
 </aside>
