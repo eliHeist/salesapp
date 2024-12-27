@@ -292,9 +292,9 @@
 												</div>
 											</Dialog.Content>
 										</Dialog.Root>
-                                        <Button variant="outline" size="iconSm" type="button" on:click={getPDF}>
+                                        <!-- <Button variant="outline" size="iconSm" type="button" on:click={getPDF}>
                                             <Download class="h-4 w-4" />
-                                        </Button>
+                                        </Button> -->
 									</div>
 								</TableCell>
 							</TableRow>
