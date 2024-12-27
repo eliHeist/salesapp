@@ -16,7 +16,7 @@
     }
 </script>
 
-<aside class="fixed left-0 hidden h-screen w-64 flex-col border-r lg:flex">
+<aside class="fixed lg:static left-0 hidden h-screen w-64 flex-col border-r lg:flex">
 	<div class="flex items-center justify-center p-6">
 		<h1 class="hidden">Minatrox</h1>
 		<Logo />

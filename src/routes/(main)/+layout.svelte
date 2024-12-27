@@ -18,7 +18,7 @@
     }
 </script>
 
-<div class="min-h-screen bg-background">
+<div class="h-screen w-screen bg-background">
 	<!-- Mobile header -->
 	<header class="lg:hidden border-b">
 		<div class="container flex gap-x-4 h-16 items-center p-6">
@@ -29,13 +29,13 @@
 		</div>
 	</header>
 
-	<div class="flex">
-		<!-- Sidebar -->
-		<SideBar user={data.user} bind:open />
+	<div class="lg:grid lg:h-screen [grid-template-columns:auto_1fr] w-screen h-full overflow-hidden">
+        <!-- Sidebar -->
+        <SideBar user={data.user} bind:open />
 
 		<!-- Main content -->
-		<main class="flex-1 lg:ml-64">
-			<div class="container py-5 px-4 lg:px-8">
+		<main class="h-full w-full overflow-y-auto">
+			<div class="py-5 px-2 sm:px-4 lg:px-8">
 				<slot />
 			</div>
 		</main>

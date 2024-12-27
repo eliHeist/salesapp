@@ -67,8 +67,4 @@
 <div id="chart-container" class="w-full" bind:this={chartContainer}></div>
 
 <style>
-	#chart-container {
-		width: 900px;
-		height: 500px;
-	}
 </style>
