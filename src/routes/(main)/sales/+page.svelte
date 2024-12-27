@@ -15,6 +15,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import NumberField from '$lib/components/custom/numberField/number-field.svelte';
+    import { generatePDF } from "$lib/generatePDF";
 
 	import SelectCombo from './SelectCombo.svelte';
 	import DatePicker from './DatePicker.svelte';
@@ -127,6 +128,10 @@
 			saleDialogOpen = false;
 		}, 500);
 	}
+
+    async function getPDF() {
+        await generatePDF()
+    }
 </script>
 
 <div class="space-y-6">
@@ -287,6 +292,9 @@
 												</div>
 											</Dialog.Content>
 										</Dialog.Root>
+                                        <Button variant="outline" size="iconSm" type="button" on:click={getPDF}>
+                                            <Download class="h-4 w-4" />
+                                        </Button>
 									</div>
 								</TableCell>
 							</TableRow>
