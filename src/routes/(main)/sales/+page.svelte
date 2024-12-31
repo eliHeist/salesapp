@@ -26,7 +26,8 @@
 		CircleArrowOutUpRight,
 		CircuitBoard,
 		Download,
-		FileQuestion
+		FileQuestion,
+        Eye
 	} from 'lucide-svelte';
 
 	import type { Product, SaleBatch } from '@prisma/client';
@@ -137,98 +138,105 @@
 <div class="space-y-6">
 	<div class="flex items-center justify-between">
 		<h2 class="text-3xl font-bold tracking-tight">Sales</h2>
-		<Dialog.Root bind:open={saleDialogOpen}>
-			<Dialog.Trigger>
-				<div tabindex="2" role="button" class="flex items-center" on:click={() => (batchSales = [])}>
-					<Plus class="mr-2 h-4 w-4" /> New Sale
-				</div>
-			</Dialog.Trigger>
-			<Dialog.Content class="w-full max-w-2xl">
-				<form
-					method="POST"
-					action="?/createBatch"
-					use:enhance
-					on:submit={handleSubmit}
-					class="space-y-4"
-				>
-					<div class="grid gap-2 lg:grid-cols-2">
-						<div>
-							<Label for="batchDate">Date*</Label>
-							<br />
-							<DatePicker bind:value={batchDate} />
-						</div>
-						<div>
-							<Label for="batchDescription">Description</Label>
-							<Input
-								id="batchDescription"
-								name="description"
-								type="text"
-								bind:value={batchDescription}
-							/>
-						</div>
-					</div>
-
-					<div class="space-y-4">
-						<h3 class="text-xl">Add items to Sale</h3>
-						<div class="grid items-center gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-							<div class="grid lg:col-span-2">
-								<SelectCombo products={data.products} bind:selectedProduct />
-							</div>
-							<p class="-mt-2 text-sm lg:order-1 lg:col-span-2">
-								{#if selectedProduct}
-									{selectedProduct.stock} units.
-								{:else}
-									Product availability.
-								{/if}
-							</p>
-							<NumberField name="" min={0} bind:max={maxQuantity} bind:value={quantity} />
-							<Button variant="secondary" type="button" on:click={addSale}>Add Item</Button>
-						</div>
-
-						<div class="mt-4">
-							{#if batchSalesLength > 0}
-								<Table>
-									<TableBody>
-										{#each batchSales as sale}
-											<TableRow>
-												<TableCell>{findProductById(sale.productId)?.name}</TableCell>
-												<TableCell class="text-right">{sale.quantity}</TableCell>
-												<TableCell class="text-right"
-													>{sale.total.toLocaleString('en-US')}</TableCell
-												>
-												<TableCell>
-													<div class="flex justify-end">
-														<Button
-															variant="outline"
-															size="iconSm"
-															type="button"
-															on:click={() => removeSale(sale.productId)}
-														>
-															<Trash2 class="h-4 w-4" />
-														</Button>
-													</div>
-												</TableCell>
-											</TableRow>
-										{/each}
-									</TableBody>
-								</Table>
-							{:else}
-								<p>No items added yet.</p>
-							{/if}
-						</div>
-					</div>
-
-					<input type="text" class="hidden" name="sales" value={JSON.stringify(batchSales)} />
-					<Dialog.Footer class="mt-8">
-						{#if batchSalesLength > 0}
-							<Button type="submit">Create Sale</Button>
-						{:else}
-							<Button variant="ghost" type="button" disabled>Create Sale</Button>
-						{/if}
-					</Dialog.Footer>
-				</form>
-			</Dialog.Content>
-		</Dialog.Root>
+        <div class="flex gap-x-3 flex-wrap md:flex-row-reverse">
+            <Dialog.Root bind:open={saleDialogOpen}>
+                <Dialog.Trigger>
+                    <Button type="button" on:click={() => (batchSales = [])}>
+                        <Plus class="mr-2 h-4 w-4" /> Add a Sale
+                    </Button>
+                </Dialog.Trigger>
+                <Dialog.Content class="w-full max-w-2xl">
+                    <form
+                        method="POST"
+                        action="?/createBatch"
+                        use:enhance
+                        on:submit={handleSubmit}
+                        class="space-y-4"
+                    >
+                        <div class="grid gap-2 lg:grid-cols-2">
+                            <div>
+                                <Label for="batchDate">Date*</Label>
+                                <br />
+                                <DatePicker bind:value={batchDate} />
+                            </div>
+                            <div>
+                                <Label for="batchDescription">Description</Label>
+                                <Input
+                                    id="batchDescription"
+                                    name="description"
+                                    type="text"
+                                    bind:value={batchDescription}
+                                />
+                            </div>
+                        </div>
+    
+                        <div class="space-y-4">
+                            <h3 class="text-xl">Add items to Sale</h3>
+                            <div class="grid items-center gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                                <div class="grid lg:col-span-2">
+                                    <SelectCombo products={data.products} bind:selectedProduct />
+                                </div>
+                                <p class="-mt-2 text-sm lg:order-1 lg:col-span-2">
+                                    {#if selectedProduct}
+                                        {selectedProduct.stock} units.
+                                    {:else}
+                                        Product availability.
+                                    {/if}
+                                </p>
+                                <NumberField name="" min={0} bind:max={maxQuantity} bind:value={quantity} />
+                                <Button variant="secondary" type="button" on:click={addSale}>Add Item</Button>
+                            </div>
+    
+                            <div class="mt-4">
+                                {#if batchSalesLength > 0}
+                                    <Table>
+                                        <TableBody>
+                                            {#each batchSales as sale}
+                                                <TableRow>
+                                                    <TableCell>{findProductById(sale.productId)?.name}</TableCell>
+                                                    <TableCell class="text-right">{sale.quantity}</TableCell>
+                                                    <TableCell class="text-right"
+                                                        >{sale.total.toLocaleString('en-US')}</TableCell
+                                                    >
+                                                    <TableCell>
+                                                        <div class="flex justify-end">
+                                                            <Button
+                                                                variant="outline"
+                                                                size="iconSm"
+                                                                type="button"
+                                                                on:click={() => removeSale(sale.productId)}
+                                                            >
+                                                                <Trash2 class="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            {/each}
+                                        </TableBody>
+                                    </Table>
+                                {:else}
+                                    <p>No items added yet.</p>
+                                {/if}
+                            </div>
+                        </div>
+    
+                        <input type="text" class="hidden" name="sales" value={JSON.stringify(batchSales)} />
+                        <Dialog.Footer class="mt-8">
+                            {#if batchSalesLength > 0}
+                                <Button type="submit">Create Sale</Button>
+                            {:else}
+                                <Button variant="ghost" type="button" disabled>Create Sale</Button>
+                            {/if}
+                        </Dialog.Footer>
+                    </form>
+                </Dialog.Content>
+            </Dialog.Root>
+            <a href="/sales/all/">
+                <Button type="button" variant="outline">
+                    <Eye class="mr-2 h-4 w-4" /> View all Sales
+                </Button>
+            </a>
+        </div>
 	</div>
 
 	<div class="grid grid-flow-col gap-4">
